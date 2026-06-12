@@ -92,16 +92,56 @@ this pipeline.
 
 ## 6. Learning-rate schedule experiment (Requirement 5)
 
-Two fine-tuning runs, identical except for the schedule, demonstrate cosine
-annealing vs step decay.
+Two Faster R-CNN fine-tuning runs, **identical except for the LR schedule**
+(same seed, epochs, base LR, data), produced by `scripts/run_experiments.py`.
+
+**The schedules themselves** (`scripts/plot_lr_schedules.py`):
 
 ![LR schedules](figures/lr_schedules.png)
 
-_Loss/mAP-vs-epoch comparison and discussion to be filled after the runs._
+- **Step decay** holds the LR flat, then multiplies it by 0.1 every few epochs —
+  a staircase.
+- **Cosine annealing** glides the LR down a half-cosine from the base value to a
+  small floor — smooth, spending longer near the extremes.
+
+**The actual runs** (5 epochs, capped batches — a demonstration, not a converged
+model):
+
+![LR experiment](figures/lr_experiment_comparison.png)
+
+| Schedule | LR per epoch | Final train loss |
+|----------|--------------|:----------------:|
+| Cosine annealing | 0.0050 → 0.0045 → 0.0033 → 0.0017 → 0.0005 | **0.742** |
+| Step decay | 0.0050 → 0.0050 → 0.0050 → 0.0005 → 0.0005 | 0.786 |
+
+**What the experiment shows:**
+
+- The **LR-vs-epoch curves clearly differ**: the smooth cosine glide vs the step
+  staircase — which is exactly what Requirement 5 asks to demonstrate.
+- Both runs converge quickly from the pretrained initialization (loss drops from
+  ~1.5 to ~0.75 within one epoch).
+- Cosine reached a slightly lower final loss here (0.742 vs 0.786): its gentle
+  late-epoch decay let training keep settling, whereas step decay holds a
+  comparatively high LR until its scheduled drop.
+
+> **Honesty note for the defense:** these are deliberately *small* runs (≈100
+> training images per run, evaluated on 50), so the absolute mAP (~0.09) is far
+> below the pretrained baseline in §4 — they exist to demonstrate the schedule
+> mechanism on a laptop, not to beat the baseline. The full run (all subset
+> images, 10-15 epochs) belongs on a cloud GPU and uses the identical command
+> without `--max-batches`.
 
 ## 7. Conclusions
 
-_The accuracy/speed trade-off story, filled once the numbers are in:_
-Faster R-CNN is expected to lead on mAP (especially small objects) while YOLOv8n
-is expected to be several times faster and far smaller — the classic two-stage
-vs one-stage trade-off.
+- **The accuracy/speed trade-off is real and measurable.** On the same COCO
+  subset, YOLOv8n is ~10× faster and ~13× smaller than Faster R-CNN, while
+  Faster R-CNN is more reliable at loose IoU (mAP@.50 0.70 vs 0.61). Overall
+  mAP@[.50:.95] is essentially tied — modern one-stage detectors have closed the
+  historical accuracy gap.
+- **Pick the detector by your constraint:** latency/size → YOLO; maximum recall
+  and small-object reliability → Faster R-CNN.
+- **The training pipeline works end-to-end** and the LR-schedule experiment
+  demonstrates both required schedules, with cosine annealing edging out step
+  decay on final loss in these runs.
+- **Everything is reproducible** from the commands at the top of this report and
+  is covered by an automated test suite (exercise-style unit tests + BDD).
