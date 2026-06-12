@@ -1,0 +1,56 @@
+"""Central configuration: paths, the class subset, and reproducibility seeds.
+
+Everything that an experiment depends on lives here so that no notebook or
+script carries magic constants.
+"""
+
+import os
+import pathlib as pl
+
+# --- Paths -----------------------------------------------------------------
+
+# Repository root (this file lives in src/objdetect/).
+ROOT_DIR = pl.Path(__file__).resolve().parents[2]
+
+# Heavy artifacts (datasets, weights) are git-ignored and live under DATA/.
+DATA_DIR = pl.Path(os.environ.get("OBJDETECT_DATA_DIR", ROOT_DIR / "DATA"))
+COCO_DIR = DATA_DIR / "coco"
+COCO_IMAGES_DIR = COCO_DIR / "val2017"
+COCO_ANNOTATIONS_FILE = COCO_DIR / "annotations" / "instances_val2017.json"
+
+CHECKPOINTS_DIR = DATA_DIR / "checkpoints"
+REPORTS_DIR = ROOT_DIR / "reports"
+FIGURES_DIR = REPORTS_DIR / "figures"
+
+# --- COCO download sources ---------------------------------------------------
+
+COCO_VAL_IMAGES_URL = "http://images.cocodataset.org/zips/val2017.zip"
+COCO_ANNOTATIONS_URL = (
+    "http://images.cocodataset.org/annotations/annotations_trainval2017.zip"
+)
+
+# --- Experiment subset -------------------------------------------------------
+
+# Fine-tuning on all 80 COCO classes is out of budget for this project, so all
+# training experiments use a fixed subset of everyday-context classes.  The
+# Streamlit app still uses the full pretrained 80-class models.
+SUBSET_CLASSES = [
+    "person",
+    "bicycle",
+    "car",
+    "dog",
+    "cat",
+    "chair",
+    "bottle",
+    "cup",
+    "laptop",
+    "cell phone",
+]
+
+# --- Reproducibility ---------------------------------------------------------
+
+SEED = 42
+
+# --- Inference defaults ------------------------------------------------------
+
+DEFAULT_SCORE_THRESHOLD = 0.5
