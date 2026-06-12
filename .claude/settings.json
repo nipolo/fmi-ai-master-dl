@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(git add *)",
-      "Bash(git commit -q -m ' *)"
+      "Bash(git commit -q -m ' *)",
+      "Bash(tail -2 /private/tmp/claude-501/-Users-bvalkov-mac-Documents-Projects-Python-DL-Project/7264adcb-7df6-4e1c-9b0f-055f30e7b0ab/tasks/breggyojf.output)",
+      "Bash(du -sh DATA)",
+      "Bash(tail -3 /private/tmp/claude-501/-Users-bvalkov-mac-Documents-Projects-Python-DL-Project/7264adcb-7df6-4e1c-9b0f-055f30e7b0ab/tasks/breggyojf.output)",
+      "Bash(ls DATA/coco)",
+      "Bash(ls -la DATA/coco/)",
+      "Bash(break)",
+      "Bash(ls DATA/coco/annotations/)"
     ]
   }
 }
