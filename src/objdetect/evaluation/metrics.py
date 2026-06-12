@@ -14,12 +14,34 @@ import contextlib
 import io
 
 import torch
+from PIL import Image
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 from torch.utils.data import DataLoader
 
 from objdetect.data.coco import collate_detections
 from objdetect.utils import resolve_device
+
+
+def _summarize_coco_eval(
+    coco_gt: COCO, results: list[dict], cat_ids: list[int]
+) -> dict[str, float]:
+    """Run COCOeval on ``results`` restricted to ``cat_ids`` and pull headline AP."""
+    if not results:
+        return {"mAP": 0.0, "mAP_50": 0.0, "mAP_75": 0.0}
+    with contextlib.redirect_stdout(io.StringIO()):
+        coco_dt = coco_gt.loadRes(results)
+        coco_eval = COCOeval(coco_gt, coco_dt, iouType="bbox")
+        coco_eval.params.imgIds = sorted({r["image_id"] for r in results})
+        coco_eval.params.catIds = cat_ids
+        coco_eval.evaluate()
+        coco_eval.accumulate()
+        coco_eval.summarize()
+    return {
+        "mAP": float(coco_eval.stats[0]),
+        "mAP_50": float(coco_eval.stats[1]),
+        "mAP_75": float(coco_eval.stats[2]),
+    }
 
 
 def _predictions_to_coco_results(
@@ -80,22 +102,45 @@ def evaluate_coco_map(
     model.to(device)
 
     results = _predictions_to_coco_results(model, dataset, device, max_images)
-    if not results:
-        return {"mAP": 0.0, "mAP_50": 0.0, "mAP_75": 0.0}
+    return _summarize_coco_eval(dataset.coco, results, dataset.cat_ids)
 
+
+def evaluate_detector_map(
+    detector,
+    dataset,
+    score_threshold: float = 0.05,
+    max_images: int | None = None,
+) -> dict[str, float]:
+    """Evaluate any :class:`~objdetect.models.base.Detector` via mAP.
+
+    Unlike :func:`evaluate_coco_map` (which needs a torchvision model and its
+    label space), this works through the common ``predict`` interface, so the
+    *same* function fairly scores both the pretrained Faster R-CNN and YOLO
+    baselines. Predicted class *names* are mapped back to COCO category ids, so
+    it only requires that the detector emits COCO class names (true for both
+    pretrained models). A low ``score_threshold`` keeps weak detections so the
+    precision-recall curve — and thus AP — is complete.
+    """
     coco_gt: COCO = dataset.coco
-    # COCOeval is chatty; silence it so script output stays readable.
-    with contextlib.redirect_stdout(io.StringIO()):
-        coco_dt = coco_gt.loadRes(results)
-        coco_eval = COCOeval(coco_gt, coco_dt, iouType="bbox")
-        coco_eval.params.imgIds = sorted({r["image_id"] for r in results})
-        coco_eval.params.catIds = dataset.cat_ids
-        coco_eval.evaluate()
-        coco_eval.accumulate()
-        coco_eval.summarize()
-
-    return {
-        "mAP": float(coco_eval.stats[0]),  # AP @ IoU=0.50:0.95
-        "mAP_50": float(coco_eval.stats[1]),  # AP @ IoU=0.50
-        "mAP_75": float(coco_eval.stats[2]),  # AP @ IoU=0.75
+    name_to_cat_id = {
+        coco_gt.loadCats([cid])[0]["name"]: cid for cid in dataset.cat_ids
     }
+
+    results: list[dict] = []
+    for index in range(len(dataset) if max_images is None else min(max_images, len(dataset))):
+        image_id = dataset.image_ids[index]
+        info = coco_gt.loadImgs([image_id])[0]
+        image = Image.open(dataset.images_dir / info["file_name"]).convert("RGB")
+        for det in detector.predict(image, score_threshold=score_threshold):
+            if det.label not in name_to_cat_id:  # outside the evaluated subset
+                continue
+            x1, y1, x2, y2 = det.box
+            results.append(
+                {
+                    "image_id": image_id,
+                    "category_id": name_to_cat_id[det.label],
+                    "bbox": [x1, y1, x2 - x1, y2 - y1],
+                    "score": det.score,
+                }
+            )
+    return _summarize_coco_eval(coco_gt, results, dataset.cat_ids)

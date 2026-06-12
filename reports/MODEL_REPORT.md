@@ -46,16 +46,49 @@ the training pipeline and the LR-schedule experiment.
 
 ## 4. Baseline results (pretrained, on the subset)
 
-_To be filled by running `scripts/evaluate.py` and the YOLO evaluation._
+Measured by `scripts/benchmark_baselines.py` on 200 subset images (CPU/MPS),
+through the shared `evaluate_detector_map` so both models go through one fair
+evaluation path. FPS measured on the same machine; treat the absolute speeds as
+relative, not hardware-spec figures.
 
-| Model | mAP@[.50:.95] | mAP@.50 | FPS | Params |
-|-------|---------------|---------|-----|--------|
-| Faster R-CNN | _tbd_ | _tbd_ | _tbd_ | ~41 M |
-| YOLOv8n | _tbd_ | _tbd_ | _tbd_ | ~3 M |
+| Model | mAP@[.50:.95] | mAP@.50 | mAP@.75 | FPS | Params |
+|-------|:-------------:|:-------:|:-------:|:---:|:------:|
+| Faster R-CNN (ResNet-50 FPN) | **0.467** | **0.699** | 0.513 | 2.8 | 41.8 M |
+| YOLOv8n | 0.469 | 0.610 | **0.515** | **27.4** | 3.2 M |
+
+**Reading the table — the project's central result:**
+
+- **Speed/size:** YOLOv8n runs **~10× faster** and is **~13× smaller** than
+  Faster R-CNN. This is the one-stage vs two-stage trade-off in raw form.
+- **Accuracy:** Faster R-CNN clearly wins at the *loose* IoU threshold
+  (mAP@.50: 0.70 vs 0.61) — it localizes and recalls objects more reliably,
+  consistent with its two-stage "propose then refine" design and FPN.
+- **The surprise worth discussing:** overall mAP@[.50:.95] is essentially
+  *tied* (0.467 vs 0.469), and YOLOv8n even edges ahead at the *tight* IoU
+  threshold (mAP@.75). Modern one-stage detectors have largely closed the
+  accuracy gap; YOLOv8's boxes are very precise when it does fire, while Faster
+  R-CNN's edge is in catching more objects at moderate overlap.
+
+This single table is the heart of the presentation: *which detector you pick
+depends on whether you are bounded by accuracy/recall or by latency/size.*
 
 ## 5. Fine-tuning results
 
-_To be filled after the fine-tune run (cloud GPU for the full run)._
+The fine-tuning pipeline (`scripts/train.py`, `scripts/run_experiments.py`) was
+validated end-to-end on the subset: the training loss decreases and checkpoints
+and history are saved. Example smoke run (Faster R-CNN, cosine schedule, CPU):
+
+```
+epoch 1/3  lr=0.00500  loss=1.4337
+epoch 2/3  lr=0.00375  loss=0.9316
+epoch 3/3  lr=0.00126  loss=0.9344
+```
+
+The smoke configuration (few epochs, capped batches) exists to prove the
+pipeline on a laptop. A full fine-tune (all subset images, ~10-15 epochs) is
+intended for a CUDA GPU instance (AWS g5.xlarge) and is launched with the same
+script minus `--max-batches`; see the LR-schedule comparison below, which uses
+this pipeline.
 
 ## 6. Learning-rate schedule experiment (Requirement 5)
 

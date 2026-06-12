@@ -1,0 +1,18 @@
+{
+  "Faster R-CNN": {
+    "mAP": 0.4669,
+    "mAP_50": 0.6985,
+    "mAP_75": 0.5129,
+    "fps": 2.83,
+    "params_millions": 41.8,
+    "evaluated_images": 200
+  },
+  "YOLOv8n": {
+    "mAP": 0.4694,
+    "mAP_50": 0.6102,
+    "mAP_75": 0.5153,
+    "fps": 27.35,
+    "params_millions": 3.2,
+    "evaluated_images": 200
+  }
+}
