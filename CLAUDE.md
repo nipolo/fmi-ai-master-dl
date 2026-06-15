@@ -5,6 +5,12 @@ Goal: a web application that detects objects in everyday-context images, backed 
 experiments with Faster R-CNN and YOLO-class models on the COCO dataset.
 Requirements source: `Documentation/Project Requirements.pdf` (in Bulgarian).
 
+> **Default scope = this Deep Learning course.** A second, *derived* project for
+> the **NN & Genetic Algorithms** course also lives in this repo (under `_NNGA/`).
+> Its instructions are **not** loaded by default — they live in `.claude/NNGA.md`.
+> Apply them **only when the user explicitly mentions the NN & Genetic Algorithms
+> course (or NNGA)**; otherwise assume everything refers to this DL project.
+
 ## Mandatory requirements (from the PDF)
 
 1. Literature review of object-detection papers/techniques.

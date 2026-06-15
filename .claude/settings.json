@@ -17,7 +17,14 @@
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(k, 'loss_curve=', [round\\(x,3\\) for x in v['loss_curve']], 'lr=', [round\\(x,4\\) for x in v['lr_curve']], 'mAP=', round\\(v['metrics']['mAP'],3\\)\\) for k,v in d.items\\(\\)]\")",
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(k, 'loss=', [round\\(x,3\\) for x in v['loss_curve']], 'lr=', [round\\(x,4\\) for x in v['lr_curve']], 'mAP=', round\\(v['metrics']['mAP'],3\\)\\) for k,v in d.items\\(\\)]\")",
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(k.upper\\(\\), '\\\\n  loss:', [round\\(x,3\\) for x in v['loss_curve']], '\\\\n  lr:  ', [round\\(x,4\\) for x in v['lr_curve']], '\\\\n  final_loss:', round\\(v['final_loss'],3\\), 'mAP:', round\\(v['metrics']['mAP'],3\\), 'mAP50:', round\\(v['metrics']['mAP_50'],3\\)\\) for k,v in d.items\\(\\)]\")",
-      "Bash(git commit -q -m 'Add cloud training guide \\(optional full fine-tune on AWS/Colab\\) *)"
+      "Bash(git commit -q -m 'Add cloud training guide \\(optional full fine-tune on AWS/Colab\\) *)",
+      "Bash(grep -vE '\\\\.\\(pdf|png|jpg|jpeg|gif|md|csv\\)$')",
+      "Bash(timeout 300 uv run pytest -q)",
+      "Bash(uv run *)",
+      "Bash(grep -v -E '\\\\.\\(png|jpg|jpeg|pdf\\)$')",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(git check-ignore *)",
+      "Bash(git mv *)"
     ]
   }
 }
