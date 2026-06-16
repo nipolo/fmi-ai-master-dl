@@ -22,12 +22,12 @@ The end result is a table that is present in most scientific papers. Here are so
 
 - [EXAMS-V: A Multi-Discipline Multilingual Multimodal Exam Benchmark for Evaluating Vision Language Models](https://arxiv.org/pdf/2403.10378)
 
-![w02_ex_table1.png](./Studing%20materials/assets/w02_ex_table1.png "w02_ex_table1.png")
+![w02_ex_table1.png](../Studing%20materials/assets/w02_ex_table1.png "w02_ex_table1.png")
 
 - [ImageNet Classification with Deep Convolutional Neural Networks](https://proceedings.neurips.cc/paper_files/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf)
 
-![w02_ex_table2.png](./Studing%20materials/assets/w02_ex_table2.png "w02_ex_table2.png")
+![w02_ex_table2.png](../Studing%20materials/assets/w02_ex_table2.png "w02_ex_table2.png")
 
 - [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/pdf/1810.04805)
 
-![w02_ex_table3.png](./Studing%20materials/assets/w02_ex_table3.png "w02_ex_table3.png")
+![w02_ex_table3.png](../Studing%20materials/assets/w02_ex_table3.png "w02_ex_table3.png")
