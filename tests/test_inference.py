@@ -2,6 +2,12 @@
 
 Course-exercise style: unittest.TestCase, Arrange / Act / Assert.
 Uses the FakeDetector from conftest so no model weights are needed.
+
+The ``detections_to_frame`` and ``summarize_counts`` behaviours are described
+by Gherkin scenarios in ``tests/features/app_workflow.feature`` instead, so they
+are intentionally not duplicated here. ``run_detection`` keeps a unit test
+because it pins the full descending sort order, which the feature only checks
+at the top position.
 """
 
 import unittest
@@ -9,12 +15,7 @@ import unittest
 import numpy as np
 from PIL import Image
 
-from objdetect.app.inference import (
-    detections_to_frame,
-    run_detection,
-    summarize_counts,
-)
-from objdetect.models.base import Detection
+from objdetect.app.inference import run_detection
 from tests.conftest import FakeDetector
 
 
@@ -59,45 +60,6 @@ class TestRunDetection(unittest.TestCase):
 
         # Assert
         self.assertEqual(actual_count, expected_count)
-
-
-class TestDetectionsToFrame(unittest.TestCase):
-
-    def test_when_given_detections_then_frame_has_expected_columns_and_rows(self):
-        # Arrange
-        detections = [
-            Detection(label="dog", score=0.9, box=(1.0, 2.0, 3.0, 4.0)),
-            Detection(label="cat", score=0.7, box=(5.0, 6.0, 7.0, 8.0)),
-        ]
-        expected_rows = 2
-        expected_columns = ["label", "score", "x1", "y1", "x2", "y2"]
-
-        # Act
-        frame = detections_to_frame(detections)
-        actual_rows = len(frame)
-        actual_columns = list(frame.columns)
-
-        # Assert
-        self.assertEqual(actual_rows, expected_rows)
-        self.assertEqual(actual_columns, expected_columns)
-
-
-class TestSummarizeCounts(unittest.TestCase):
-
-    def test_when_repeated_labels_then_counts_per_class(self):
-        # Arrange
-        detections = [
-            Detection(label="person", score=0.9, box=(0, 0, 1, 1)),
-            Detection(label="person", score=0.8, box=(0, 0, 1, 1)),
-            Detection(label="dog", score=0.7, box=(0, 0, 1, 1)),
-        ]
-        expected = {"person": 2, "dog": 1}
-
-        # Act
-        actual = summarize_counts(detections)
-
-        # Assert
-        self.assertEqual(actual, expected)
 
 
 if __name__ == "__main__":

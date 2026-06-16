@@ -1,0 +1,84 @@
+"""Step definitions binding the app_workflow.feature scenarios (BDD).
+
+These cover the remaining app-facing behaviours beyond thresholding: picking a
+model from the UI dropdown, tabulating detections for display, and summarizing
+detections per class. As with the detection steps, no model weights are needed
+-- the model-selection scenario only exercises the offline error path.
+"""
+
+import pytest
+from pytest_bdd import given, parsers, scenarios, then, when
+
+from objdetect.app.inference import (
+    detections_to_frame,
+    load_model,
+    summarize_counts,
+)
+from objdetect.models.base import Detection
+
+# Bind every scenario in the feature file.
+scenarios("../features/app_workflow.feature")
+
+
+@pytest.fixture
+def context() -> dict:
+    """Mutable bag carrying state between Given/When/Then steps."""
+    return {}
+
+
+@when(parsers.parse('I load a model called "{display_name}"'))
+def _load_model(context, display_name):
+    try:
+        context["model"] = load_model(display_name)
+    except ValueError as exc:
+        context["error"] = exc
+
+
+@then(parsers.parse('loading fails with an "{message}" error'))
+def _assert_load_error(context, message):
+    assert "error" in context, "expected loading to raise, but it succeeded"
+    assert message in str(context["error"])
+
+
+@given("detections of a dog and a cat")
+def _two_detections(context):
+    context["detections"] = [
+        Detection(label="dog", score=0.9, box=(1.0, 2.0, 3.0, 4.0)),
+        Detection(label="cat", score=0.7, box=(5.0, 6.0, 7.0, 8.0)),
+    ]
+
+
+@when("I tabulate the detections")
+def _tabulate(context):
+    context["frame"] = detections_to_frame(context["detections"])
+
+
+@then(parsers.parse("the table has {rows:d} rows"))
+def _assert_rows(context, rows):
+    assert len(context["frame"]) == rows
+
+
+@then(parsers.parse('the table columns are "{columns}"'))
+def _assert_columns(context, columns):
+    expected = [c.strip() for c in columns.split(",")]
+    assert list(context["frame"].columns) == expected
+
+
+@given(parsers.parse("detections of {first}, {second}, and {third}"))
+def _three_detections(context, first, second, third):
+    labels = [first, second, third]
+    context["detections"] = [
+        Detection(label=label, score=0.9, box=(0.0, 0.0, 1.0, 1.0)) for label in labels
+    ]
+
+
+@when("I summarize the detections")
+def _summarize(context):
+    context["summary"] = summarize_counts(context["detections"])
+
+
+@then(parsers.parse('the summary reports {count_a:d} "{label_a}" and {count_b:d} "{label_b}"'))
+def _assert_summary(context, count_a, label_a, count_b, label_b):
+    summary = context["summary"]
+    assert summary.get(label_a) == count_a
+    assert summary.get(label_b) == count_b

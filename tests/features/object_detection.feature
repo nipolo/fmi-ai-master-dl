@@ -3,17 +3,16 @@ Feature: Detecting objects in an uploaded photo
   I want to upload a photo and choose a confidence threshold
   So that I can see which everyday objects the model finds
 
-  Scenario: Detecting objects above the confidence threshold
+  Scenario Outline: The confidence threshold controls how many objects are detected
     Given an image with a dog at 0.95 and a person at 0.80 confidence
-    When I run detection with a confidence threshold of 0.50
-    Then 2 objects are detected
-    And the most confident detection is a "dog"
+    When I run detection with a confidence threshold of <threshold>
+    Then <count> objects are detected
+    And the most confident detection is a "<top_label>"
 
-  Scenario: Raising the threshold filters out weak detections
-    Given an image with a dog at 0.95 and a person at 0.80 confidence
-    When I run detection with a confidence threshold of 0.90
-    Then 1 object is detected
-    And the most confident detection is a "dog"
+    Examples:
+      | threshold | count | top_label |
+      | 0.50      | 2     | dog       |
+      | 0.90      | 1     | dog       |
 
   Scenario: No objects pass a very high threshold
     Given an image with a dog at 0.95 and a person at 0.80 confidence
