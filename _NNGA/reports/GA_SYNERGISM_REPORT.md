@@ -162,7 +162,7 @@ problem; this project adds the outer, evolutionary layer.
 
 ## 7. Technological description
 
-- **Development environment:** Python 3.13, managed with `uv`; VS Code.
+- **Development environment:** Python 3.13.7, managed with `uv`; VS Code.
 - **Library stack:** Ultralytics (YOLOv8 + the genetic tuner), PyTorch +
   torchvision, pycocotools, matplotlib; the existing `objdetect` package is
   reused for config/seed and the data subset definition.

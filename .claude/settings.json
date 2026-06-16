@@ -24,7 +24,9 @@
       "Bash(grep -v -E '\\\\.\\(png|jpg|jpeg|pdf\\)$')",
       "Bash(echo \"EXIT=$?\")",
       "Bash(git check-ignore *)",
-      "Bash(git mv *)"
+      "Bash(git mv *)",
+      "Bash(uv add *)",
+      "Read(//opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/bin/**)"
     ]
   }
 }

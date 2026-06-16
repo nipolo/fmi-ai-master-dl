@@ -5,7 +5,7 @@ deliverable. Phases are ordered so each one produces something runnable and
 presentable.
 
 ## Phase 0 — Scaffolding
-- `uv`-managed Python 3.13 project, `pyproject.toml`, package skeleton
+- `uv`-managed Python 3.13.7 project, `pyproject.toml`, package skeleton
   `src/objdetect/`, `tests/`, `reports/`, `.gitignore` for datasets/weights.
 - CI-style local check: `uv run pytest` green from day one.
 - **Deliverable:** runnable empty project, first git commits.

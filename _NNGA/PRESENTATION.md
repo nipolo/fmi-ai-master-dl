@@ -141,7 +141,7 @@ genetic algorithm.
 
 ## Technological description (технологично описание)
 
-- **Environment:** Python 3.13, managed with `uv`; VS Code.
+- **Environment:** Python 3.13.7, managed with `uv`; VS Code.
 - **Library stack:** Ultralytics (YOLOv8 + genetic tuner), PyTorch /
   torchvision, pycocotools, matplotlib. Reuses my `objdetect` package for
   config, seed, and the class subset.

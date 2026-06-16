@@ -28,7 +28,7 @@ Additional success criteria (user's own):
 
 ## Tech stack
 
-- Python 3.13 (latest version fully supported by the DL ecosystem), managed with `uv`.
+- Python 3.13.7 (latest version fully supported by the DL ecosystem), managed with `uv`.
 - PyTorch + torchvision (Faster R-CNN), `ultralytics` (YOLO), `pycocotools`.
 - Streamlit for the UI.
 - `pytest` + `pytest-bdd` for BDD tests.
