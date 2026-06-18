@@ -15,8 +15,18 @@ import unittest
 import numpy as np
 from PIL import Image
 
-from objdetect.app.inference import run_detection
+from objdetect.app.inference import run_detection, select_detections
+from objdetect.models.base import Detection
 from tests.conftest import FakeDetector
+
+
+def _three_detections() -> list[Detection]:
+    """Three distinct detections whose order the tests rely on."""
+    return [
+        Detection(label="tv", score=0.88, box=(1.0, 1.0, 2.0, 2.0)),
+        Detection(label="chair", score=0.60, box=(3.0, 3.0, 4.0, 4.0)),
+        Detection(label="tv", score=0.55, box=(5.0, 5.0, 6.0, 6.0)),
+    ]
 
 
 def _make_image() -> Image.Image:
@@ -60,6 +70,45 @@ class TestRunDetection(unittest.TestCase):
 
         # Assert
         self.assertEqual(actual_count, expected_count)
+
+
+class TestSelectDetections(unittest.TestCase):
+
+    def test_when_no_rows_selected_then_returns_all_detections(self):
+        # Arrange
+        detections = _three_detections()
+        selected_rows: list[int] = []
+        expected = detections
+
+        # Act
+        actual = select_detections(detections, selected_rows)
+
+        # Assert
+        self.assertEqual(actual, expected)
+
+    def test_when_rows_selected_then_returns_only_those_in_original_order(self):
+        # Arrange
+        detections = _three_detections()
+        selected_rows = [2, 0]  # out of order on purpose
+        expected = [detections[0], detections[2]]
+
+        # Act
+        actual = select_detections(detections, selected_rows)
+
+        # Assert
+        self.assertEqual(actual, expected)
+
+    def test_when_selection_index_out_of_range_then_it_is_ignored(self):
+        # Arrange
+        detections = _three_detections()
+        selected_rows = [1, 99]  # 99 is a stale index from a previous image
+        expected = [detections[1]]
+
+        # Act
+        actual = select_detections(detections, selected_rows)
+
+        # Assert
+        self.assertEqual(actual, expected)
 
 
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ from pytest_bdd import given, parsers, scenarios, then, when
 from objdetect.app.inference import (
     detections_to_frame,
     load_model,
+    select_detections,
     summarize_counts,
 )
 from objdetect.models.base import Detection
@@ -82,3 +83,16 @@ def _assert_summary(context, count_a, label_a, count_b, label_b):
     summary = context["summary"]
     assert summary.get(label_a) == count_a
     assert summary.get(label_b) == count_b
+
+
+@when(parsers.re(r'I select the table rows "(?P<rows>[^"]*)"'))
+def _select_rows(context, rows):
+    selected_rows = [int(r.strip()) for r in rows.split(",") if r.strip()]
+    context["shown"] = select_detections(context["detections"], selected_rows)
+
+
+@then(parsers.parse('the shown detections are "{labels}"'))
+def _assert_shown(context, labels):
+    expected = [label.strip() for label in labels.split(",")]
+    actual = [det.label for det in context["shown"]]
+    assert actual == expected

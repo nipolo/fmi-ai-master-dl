@@ -17,3 +17,13 @@ Feature: Driving the detection app
     Given detections of dog, dog, and person
     When I summarize the detections
     Then the summary reports 2 "dog" and 1 "person"
+
+  Scenario: No row selection shows every detection on the photo
+    Given detections of a dog and a cat
+    When I select the table rows ""
+    Then the shown detections are "dog, cat"
+
+  Scenario: Selecting rows shows only those detections
+    Given detections of a dog and a cat
+    When I select the table rows "1"
+    Then the shown detections are "cat"

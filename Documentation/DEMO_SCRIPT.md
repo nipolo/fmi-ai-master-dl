@@ -16,8 +16,9 @@ Pre-download model weights once (so the demo isn't waiting on a download):
 uv run python scripts/compare_models_visual.py   # pulls both model weights
 ```
 
-Have ready: 2-3 everyday photos on disk (a street scene, a desk, a pet) and one
-COCO sample (`DATA/coco/val2017/000000000139.jpg`).
+Have ready: 2-3 everyday photos on disk (a street scene, a desk, a pet). The
+side-by-side slide figure is built from the committed demo photo
+(`reports/figures/photo-to-compare-models.JPG`).
 
 ## The talk (≈12 min, follows reports/PRESENTATION.md)
 

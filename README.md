@@ -72,6 +72,8 @@ uv run python scripts/compare_models_visual.py                  # side-by-side i
 uv run streamlit run src/objdetect/app/main.py
 ```
 
+On first run each model downloads its pretrained weights automatically (YOLO via ultralytics, Faster R-CNN via torchvision) — needs internet once; cached afterwards. Only the data and EDA/training/benchmark commands need the COCO dataset (`download_data.py`); the app runs on uploaded photos without it.
+
 ## VS Code
 
 Pre-configured tasks and debug profiles live in `.vscode/`.

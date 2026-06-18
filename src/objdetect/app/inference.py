@@ -52,6 +52,23 @@ def detections_to_frame(detections: list[Detection]) -> pd.DataFrame:
     )
 
 
+def select_detections(
+    detections: list[Detection], selected_rows: list[int]
+) -> list[Detection]:
+    """Pick the detections to draw given the table rows the user selected.
+
+    ``selected_rows`` holds positional indices into ``detections`` (the table
+    shares its order). When nothing is selected the user has not filtered, so
+    every detection is returned; otherwise only the chosen rows are kept, in
+    the order ``detections`` already has. Out-of-range indices are ignored so a
+    stale selection from a previous image can never raise.
+    """
+    if not selected_rows:
+        return detections
+    chosen = set(selected_rows)
+    return [det for i, det in enumerate(detections) if i in chosen]
+
+
 def summarize_counts(detections: list[Detection]) -> dict[str, int]:
     """Count detections per class label (the app's summary line)."""
     counts: dict[str, int] = {}

@@ -92,7 +92,7 @@ Severe **imbalance**: person 11 004 instances vs toaster 9 (~1 200:1).
 
 ![w:900](figures/model_comparison_visual.png)
 
-Same image: Faster R-CNN fires on more objects (25 vs 6 at 0.5) — higher recall,
+Same image: Faster R-CNN fires on more objects (12 vs 3 at 0.5) — higher recall,
 more false positives. The trade-off, made visible.
 
 ---

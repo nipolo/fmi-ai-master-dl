@@ -1,16 +1,18 @@
 """Render a side-by-side Faster R-CNN vs YOLO detection figure (presentation aid).
 
-Picks a COCO val image, runs both detectors, and saves a two-panel image so the
-accuracy/recall difference is visible at a glance.
+Runs both detectors on an image and saves a two-panel figure so the
+accuracy/recall difference is visible at a glance. Defaults to the committed
+demo photo so the presentation slide reproduces without the COCO dataset.
 
 Usage:
-  uv run python scripts/compare_models_visual.py --image DATA/coco/val2017/000000000139.jpg
+  uv run python scripts/compare_models_visual.py
+  uv run python scripts/compare_models_visual.py --image reports/figures/photo-to-compare-models.JPG
 """
 
 import argparse
 
 import matplotlib.pyplot as plt
-from PIL import Image
+from PIL import Image, ImageOps
 
 from objdetect import config
 from objdetect.models import build_detector
@@ -20,12 +22,13 @@ from objdetect.visualization import draw_detections
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--image", default=str(config.COCO_IMAGES_DIR / "000000000139.jpg")
+        "--image",
+        default="reports/figures/photo-to-compare-models.JPG",
     )
     parser.add_argument("--threshold", type=float, default=0.5)
     args = parser.parse_args()
 
-    image = Image.open(args.image).convert("RGB")
+    image = ImageOps.exif_transpose(Image.open(args.image)).convert("RGB")
 
     frcnn = build_detector("faster_rcnn")
     yolo = build_detector("yolo", weights="yolo26n.pt")
