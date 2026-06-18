@@ -12,6 +12,14 @@ presentable.
 > uv run python scripts/plot_lr_schedules.py        # LR schedule figure
 > uv run python scripts/benchmark_baselines.py      # baseline comparison table (§4)
 > uv run python scripts/run_experiments.py          # fine-tune + LR comparison (§6)
+> # Extension — custom traffic-cone class (§7):
+> git clone --depth 1 https://github.com/krisstern/traffic-cone-image-dataset.git DATA/_cone_src
+> uv run python scripts/prepare_cone_dataset.py      # seeded 80/20 split + data yaml
+> uv run yolo detect train model=yolo26n.pt data=DATA/traffic_cone/traffic_cone.yaml \
+>   epochs=100 imgsz=640 batch=16 device=mps cache=disk patience=30 \
+>   project=DATA/runs name=cone_yolo26n
+> # publish best weights to the path the app loads (config.CHECKPOINTS_DIR):
+> cp runs/detect/DATA/runs/cone_yolo26n/weights/best.pt DATA/checkpoints/cone_yolo26n.pt
 > ```
 
 ## How this report follows the Model-Report-File (MRF) guidelines
@@ -168,7 +176,38 @@ model):
 > which records both splits per epoch. The LR-vs-epoch and training-loss-vs-epoch
 > curves above are shown in the interim.
 
-## 7. Conclusions
+## 7. Extension — fine-tuning a new class (traffic cone)
+
+**Hypothesis:** YOLO26n can be extended to a class **outside COCO's 80** by
+fine-tuning on a small, single-class dataset, yielding a deployable third model
+for the app without retraining on COCO.
+
+- **Dataset:** [krisstern/traffic-cone-image-dataset](https://github.com/krisstern/traffic-cone-image-dataset)
+  — 263 images, single class `traffic cone`, YOLO-format labels, no known
+  copyright. Laid out by `scripts/prepare_cone_dataset.py` into a reproducible,
+  seeded (SEED=42) **80/20 split: 210 train / 53 val**.
+- **Config:** fine-tune from `yolo26n.pt`, 100 epochs, imgsz 640, batch 16,
+  optimizer `auto` (AdamW, lr≈0.002), `patience=30`, `device=mps`.
+- **Hardware:** local Apple Silicon — MacBook Air **M3** (10-core GPU, 16 GB).
+  Full run completed in **~32 min** (≈26 s/epoch), comfortably on-device.
+
+| # | Model (hyperparameters) | Precision | Recall | mAP@.50 | mAP@[.50:.95] | Comments |
+|---|-------------------------|:---------:|:------:|:-------:|:-------------:|----------|
+| 1 | **Cone YOLO26n** — fine-tuned, 1 class, 100 ep, 210 train imgs | 0.919 | 0.837 | 0.898 | 0.660 | Strong for a tiny single-class set; an easy, visually distinct class converges fast. Metrics on the held-out 53-image val split. |
+
+> **Outcome:** single-class fine-tuning makes the model forget COCO's 80 classes
+> (expected catastrophic forgetting), so the cone model is not deployed alone.
+> Instead the app exposes a combined **"YOLO26n + Cones (81 classes)"** option
+> (`EnsembleDetector`) that runs stock YOLO26n and the cone model together and
+> concatenates their detections — covering all 81 classes in one pass.
+
+**Honesty note for the defense.** This is a deliberately small, *easy* class on
+263 images; the high mAP reflects how distinctive cones are, not a large-scale
+result. The combined ensemble assumes disjoint classes (COCO vs. cone) and
+applies no cross-model NMS, which is safe here because the class sets do not
+overlap.
+
+## 8. Conclusions
 
 - **The accuracy/speed trade-off is real and measurable.** On the same COCO
   subset, YOLO26n is ~18× faster and ~17× smaller than Faster R-CNN, while
@@ -181,5 +220,9 @@ model):
 - **The training pipeline works end-to-end**, and the LR-schedule experiment
   demonstrates both required schedules, with cosine annealing edging out step
   decay on final training loss in these runs.
+- **The model is extensible to new classes.** Fine-tuning YOLO26n on a small
+  single-class set (traffic cone, not in COCO) reached mAP@.50 0.898 on-device
+  in ~32 min, and ships as a third app model plus a combined 81-class ensemble
+  (§7).
 - **Everything is reproducible** from the commands at the top of this report and
   is covered by an automated test suite (exercise-style unit tests + BDD).

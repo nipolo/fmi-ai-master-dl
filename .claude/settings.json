@@ -30,7 +30,8 @@
       "Bash(echo \"=== stderr above, exit $? ===\")",
       "Bash(uv sync *)",
       "Bash(echo \"EXIT: $?\")",
-      "Bash(python3)"
+      "Bash(python3)",
+      "WebSearch"
     ]
   }
 }
