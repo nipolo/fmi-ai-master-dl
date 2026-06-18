@@ -78,11 +78,12 @@ Pre-configured tasks and debug profiles live in `.vscode/`.
 
 **Tasks** (`Cmd+Shift+P` → _Tasks: Run Task_):
 
-| Task                 | What it does                                                |
-| -------------------- | ----------------------------------------------------------- |
-| Setup venv (uv sync) | build `.venv` and install all dependencies                  |
-| Run app (Streamlit)  | launch the web app (runs `uv sync` first)                   |
-| Run tests (pytest)   | run the BDD + unit suite (also the default _Run Test Task_) |
+| Task      | What it does                                                |
+| --------- | ----------------------------------------------------------- |
+| setup     | build `.venv` and install all dependencies (`uv sync`)      |
+| run:app   | launch the Streamlit web app                                |
+| run:eda   | generate EDA figures + summary from COCO data               |
+| run:tests | run the BDD + unit suite (also the default _Run Test Task_) |
 
 **Debugging** (Run and Debug panel, or `F5`) — uses the `.venv` interpreter:
 

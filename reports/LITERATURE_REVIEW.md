@@ -67,9 +67,10 @@ dense grid in a single forward pass.
 - **Focal Loss / RetinaNet** (Lin et al., 2017) addressed one-stage detectors'
   weakness — the overwhelming number of easy background anchors — letting a
   one-stage model match two-stage accuracy.
-- **Modern YOLO** (v3 through v8/v11; Ultralytics) brought anchor-free heads,
-  better backbones/necks (CSP, PANet), and strong training tricks (mosaic
-  augmentation). The project uses **YOLOv8** via Ultralytics.
+- **Modern YOLO** (v3 through v8/v11 up to YOLO26; Ultralytics) brought
+  anchor-free heads, better backbones/necks (CSP, PANet), and strong training
+  tricks (mosaic augmentation). The project uses **YOLO26** (nano) via
+  Ultralytics — the latest release in the family.
 
 One-stage detectors are generally **faster and lighter**, at some accuracy cost
 that modern versions have largely closed.
@@ -116,6 +117,7 @@ sizes, scene density, class co-occurrence, and annotation anomalies.
   Object Detection*, CVPR 2016.
 - Liu et al., *SSD: Single Shot MultiBox Detector*, ECCV 2016.
 - Jocher et al., *Ultralytics YOLOv8*, 2023.
+- Ultralytics, *YOLO26* (model used in this project), Ultralytics releases.
 - Lin et al., *Microsoft COCO: Common Objects in Context*, ECCV 2014.
 - Loshchilov & Hutter, *SGDR: Stochastic Gradient Descent with Warm Restarts*
   (cosine annealing), ICLR 2017.

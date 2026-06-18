@@ -3,16 +3,16 @@
     "mAP": 0.4669,
     "mAP_50": 0.6985,
     "mAP_75": 0.5129,
-    "fps": 2.83,
+    "fps": 3.23,
     "params_millions": 41.8,
     "evaluated_images": 200
   },
-  "YOLOv8n": {
-    "mAP": 0.4694,
-    "mAP_50": 0.6102,
-    "mAP_75": 0.5153,
-    "fps": 27.35,
-    "params_millions": 3.2,
+  "YOLO26n": {
+    "mAP": 0.4697,
+    "mAP_50": 0.6217,
+    "mAP_75": 0.5122,
+    "fps": 57.24,
+    "params_millions": 2.4,
     "evaluated_images": 200
   }
 }

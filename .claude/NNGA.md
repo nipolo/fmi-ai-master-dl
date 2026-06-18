@@ -8,7 +8,7 @@
 ## What the project is
 
 Course variant: **"със синергизъм" (with synergism)** — a neural network must be
-paired with a genetic algorithm. We reuse the DL project's **YOLOv8n** detector
+paired with a genetic algorithm. We reuse the DL project's **YOLO26n** detector
 and COCO data, and add the synergism:
 
 > a **genetic algorithm evolves the detector's hyperparameters**, using the
@@ -16,7 +16,7 @@ and COCO data, and add the synergism:
 
 ## Key points (the whole project in six lines)
 
-- **Network:** YOLOv8n (one-stage detector), COCO-pretrained, from the DL project.
+- **Network:** YOLO26n (one-stage detector), COCO-pretrained, from the DL project.
 - **GA tool:** Ultralytics' built-in evolutionary tuner (`YOLO.tune`) — chosen
   deliberately over a hand-written GA.
 - **Genome:** ~20 training hyperparameters (`lr0`, `lrf`, momentum, weight decay,
@@ -27,8 +27,9 @@ and COCO data, and add the synergism:
   selection of the best prior genome. **No crossover** — it's an evolution
   strategy, not a textbook three-operator GA. State this precisely.
 - **Result (smoke run, 8 generations, coco8, MPS):** best-so-far fitness rose
-  0 → 0.037 → 0.0995 → **0.103**. Demonstrates the mechanism; the full run is the
-  identical command with more generations on the COCO subset on a GPU.
+  0 → 0.0006 → 0.0074 → **0.0308** (peak at gen 7). Tiny/noisy by design (3 epochs
+  on 8 images) — demonstrates the mechanism; the full run is the identical command
+  with more generations on the COCO subset on a GPU.
 
 ## Deliverables (under `_NNGA/`)
 

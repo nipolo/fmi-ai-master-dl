@@ -49,7 +49,7 @@ adapted, and both adaptations are flagged where they occur:
 | Model | Family | Backbone | Params | Source |
 |-------|--------|----------|:------:|--------|
 | Faster R-CNN | Two-stage | ResNet-50 + FPN | 41.8 M | torchvision, COCO-pretrained |
-| YOLOv8n | One-stage | CSP / anchor-free | 3.2 M | Ultralytics, COCO-pretrained |
+| YOLO26n | One-stage | anchor-free | 2.4 M | Ultralytics (YOLO26), COCO-pretrained |
 
 Both start from COCO-pretrained weights. The pretrained models are evaluated as
 the baseline comparison (§4); Faster R-CNN is additionally fine-tuned to
@@ -75,25 +75,25 @@ Bold marks the best value in each metric column.
 
 | # | Model (hyperparameters) | mAP@[.50:.95] | mAP@.50 | FPS (img/s) | Comments |
 |---|-------------------------|:-------------:|:-------:|:-----------:|----------|
-| 1 | **Faster R-CNN** — two-stage, ResNet-50+FPN, 41.8 M (baseline) | 0.467 | **0.699** | 2.8 | Baseline. Strongest at loose IoU — its "propose then refine" design + FPN recalls more objects. Slow and large. |
-| 2 | **YOLOv8n** — one-stage, anchor-free, 3.2 M | **0.469** (+0.5%) | 0.610 (−12.6%) | **27.4** (+866%) | Overall mAP essentially tied; ~10× faster and ~13× smaller. Loses recall at loose IoU but its fired boxes are precise. |
+| 1 | **Faster R-CNN** — two-stage, ResNet-50+FPN, 41.8 M (baseline) | 0.467 | **0.699** | 3.2 | Baseline. Strongest at loose IoU — its "propose then refine" design + FPN recalls more objects. Slow and large. |
+| 2 | **YOLO26n** — one-stage, anchor-free, 2.4 M | **0.470** (+0.6%) | 0.622 (−11.0%) | **57.2** (+1670%) | Overall mAP essentially tied; ~18× faster and ~17× smaller. Loses recall at loose IoU but its fired boxes are precise. |
 
-> **Best model: YOLOv8n**, for this project's target (a Streamlit web app
+> **Best model: YOLO26n**, for this project's target (a Streamlit web app
 > detecting objects in everyday images). Overall accuracy is tied with the
-> baseline (+0.5% mAP@[.50:.95]) while it runs ~10× faster and is ~13× smaller —
+> baseline (+0.6% mAP@[.50:.95]) while it runs ~18× faster and is ~17× smaller —
 > decisive for interactive, deployable inference. **Choose Faster R-CNN instead
 > only if maximum recall at loose IoU is the priority** (it leads mAP@.50 by
-> +12.6%), e.g. when missing objects is costlier than latency.
+> +12.4%), e.g. when missing objects is costlier than latency.
 
 **Reading the table — the project's central result:**
 
-- **Speed/size:** YOLOv8n runs ~10× faster and is ~13× smaller — the one-stage
+- **Speed/size:** YOLO26n runs ~18× faster and is ~17× smaller — the one-stage
   vs two-stage trade-off in raw form.
 - **Accuracy:** Faster R-CNN clearly wins at the *loose* IoU threshold
-  (mAP@.50 0.70 vs 0.61) — it localizes and recalls objects more reliably.
+  (mAP@.50 0.70 vs 0.62) — it localizes and recalls objects more reliably.
 - **The surprise worth discussing:** overall mAP@[.50:.95] is essentially *tied*
-  (0.467 vs 0.469). Modern one-stage detectors have largely closed the accuracy
-  gap; YOLOv8's boxes are very precise when it fires, while Faster R-CNN's edge
+  (0.467 vs 0.470). Modern one-stage detectors have largely closed the accuracy
+  gap; YOLO26's boxes are very precise when it fires, while Faster R-CNN's edge
   is catching more objects at moderate overlap.
 
 This single table is the heart of the presentation: *which detector you pick
@@ -171,11 +171,11 @@ model):
 ## 7. Conclusions
 
 - **The accuracy/speed trade-off is real and measurable.** On the same COCO
-  subset, YOLOv8n is ~10× faster and ~13× smaller than Faster R-CNN, while
-  Faster R-CNN is more reliable at loose IoU (mAP@.50 0.70 vs 0.61). Overall
+  subset, YOLO26n is ~18× faster and ~17× smaller than Faster R-CNN, while
+  Faster R-CNN is more reliable at loose IoU (mAP@.50 0.70 vs 0.62). Overall
   mAP@[.50:.95] is essentially tied — modern one-stage detectors have closed the
   historical accuracy gap.
-- **Best model: YOLOv8n** for the web-app target (tied accuracy, far faster and
+- **Best model: YOLO26n** for the web-app target (tied accuracy, far faster and
   smaller); **Faster R-CNN** when maximum recall / small-object reliability
   outranks latency and size.
 - **The training pipeline works end-to-end**, and the LR-schedule experiment

@@ -58,7 +58,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("--model", default="yolov8n.pt", help="base YOLO weights")
+    parser.add_argument("--model", default="yolo26n.pt", help="base YOLO weights")
     parser.add_argument(
         "--data", default="coco8.yaml", help="Ultralytics dataset YAML"
     )
@@ -113,8 +113,15 @@ def main() -> int:
     )
 
     # Collect the GA's output (results table, best genome, fitness plots) next to
-    # the report so the presentation can cite real files.
-    tune_dir = RUNS_DIR / "ga_evolution"
+    # the report so the presentation can cite real files. Ultralytics' `tune`
+    # ignores `exist_ok` for its run-dir naming and appends a numeric suffix
+    # (ga_evolution, ga_evolution-2, ...) when a previous run exists, so resolve
+    # the *newest* matching directory rather than assuming the bare name — else
+    # we would copy a stale earlier run's artifacts.
+    candidates = sorted(
+        RUNS_DIR.glob("ga_evolution*"), key=lambda p: p.stat().st_mtime
+    )
+    tune_dir = candidates[-1] if candidates else RUNS_DIR / "ga_evolution"
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     copied = []

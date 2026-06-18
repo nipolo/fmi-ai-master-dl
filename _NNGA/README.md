@@ -66,6 +66,6 @@ which the script copies into `reports/`.
 ## Relationship to the DL project
 
 This is intentionally a thin, focused layer on top of the DL project. The neural
-network (YOLOv8n), the COCO data, and the EDA are shared; the only new idea is
+network (YOLO26n), the COCO data, and the EDA are shared; the only new idea is
 the **evolutionary hyperparameter search**. Submitting a derived project across
 both courses is permitted for this course.

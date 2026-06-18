@@ -79,10 +79,10 @@ Severe **imbalance**: person 11 004 instances vs toaster 9 (~1 200:1).
 
 | Model | mAP@.50:.95 | mAP@.50 | FPS | Params |
 |--|:--:|:--:|:--:|:--:|
-| Faster R-CNN | 0.467 | **0.699** | 2.8 | 41.8 M |
-| YOLOv8n | 0.469 | 0.610 | **27.4** | 3.2 M |
+| Faster R-CNN | 0.467 | **0.699** | 3.2 | 41.8 M |
+| YOLO26n | 0.470 | 0.622 | **57.2** | 2.4 M |
 
-- YOLO: **~10× faster, ~13× smaller**.
+- YOLO: **~18× faster, ~17× smaller**.
 - Faster R-CNN: **better at loose IoU** (more reliable recall).
 - Overall mAP is **tied** — modern one-stage has closed the gap.
 

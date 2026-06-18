@@ -22,8 +22,18 @@
       "presentation": {
         "reveal": "always",
         "panel": "dedicated"
-      },
-      "dependsOn": ["Setup venv (uv sync)"]
+      }
+    },
+    {
+      "label": "run:eda",
+      "type": "shell",
+      "command": "uv run python scripts/run_eda.py",
+      "detail": "Generate EDA figures + summary from COCO data",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
     },
     {
       "label": "run:tests",

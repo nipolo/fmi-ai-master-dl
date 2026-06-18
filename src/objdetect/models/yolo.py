@@ -13,7 +13,7 @@ from objdetect.utils import resolve_device
 class YOLODetector:
     """Ultralytics YOLO wrapped to the project's common detector interface.
 
-    ``weights`` accepts an Ultralytics model name (e.g. ``"yolov8n.pt"``,
+    ``weights`` accepts an Ultralytics model name (e.g. ``"yolo26n.pt"``,
     downloaded on first use) or a path to a fine-tuned checkpoint.
     """
 
@@ -21,7 +21,7 @@ class YOLODetector:
 
     def __init__(
         self,
-        weights: str = "yolov8n.pt",
+        weights: str = "yolo26n.pt",
         device: str | None = None,
     ) -> None:
         # Imported lazily so the rest of the package (and its tests) does not

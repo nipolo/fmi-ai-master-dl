@@ -57,7 +57,7 @@ def main() -> int:
     dataset = CocoSubsetDataset(train=False)
     models = {
         "Faster R-CNN": ("faster_rcnn", {"device": args.device}),
-        "YOLOv8n": ("yolo", {"weights": "yolov8n.pt", "device": args.device}),
+        "YOLO26n": ("yolo", {"weights": "yolo26n.pt", "device": args.device}),
     }
 
     results = {}

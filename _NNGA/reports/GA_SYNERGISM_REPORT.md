@@ -19,10 +19,10 @@ network's own validation accuracy as fitness.
 ## 1. The task
 
 Object detection: given an everyday image, predict *what* objects are present and
-*where* (bounding boxes). The neural network is **YOLOv8n** (Ultralytics), the
+*where* (bounding boxes). The neural network is **YOLO26n** (Ultralytics), the
 one-stage detector already studied and benchmarked in the DL project
-(`reports/MODEL_REPORT.md`: mAP@.50:.95 ≈ 0.47 on the COCO subset, ~27 FPS,
-3.2 M params). Here the network is the *substrate*; the new contribution is how
+(`reports/MODEL_REPORT.md`: mAP@.50:.95 ≈ 0.47 on the COCO subset, ~57 FPS,
+2.4 M params). Here the network is the *substrate*; the new contribution is how
 its hyperparameters are chosen.
 
 ## 2. The data
@@ -48,8 +48,8 @@ its hyperparameters are chosen.
 
 | | Value |
 |--|--|
-| Architecture | YOLOv8n — one-stage, anchor-free, CSPDarknet backbone + PAN neck |
-| Parameters | ~3.2 M |
+| Architecture | YOLO26n — one-stage, anchor-free; latest Ultralytics YOLO release |
+| Parameters | ~2.4 M |
 | Optimizer | AdamW |
 | Init | COCO-pretrained weights, then fine-tuned per GA individual |
 | Fixed | seed = 42 (shared with DL project `config.SEED`), epochs per individual |
@@ -116,27 +116,28 @@ Ultralytics' own diagnostics are kept alongside:
 `reports/figures/tune_scatter_plots.png` (fitness vs each hyperparameter, which
 shows *which* genes the search found to matter).
 
-**The actual smoke run** (8 generations, 3 epochs each, coco8, Apple MPS, ~147 s):
+**The actual smoke run** (8 generations, 3 epochs each, coco8, Apple MPS):
 
 | Generation | Genome fitness | mAP@.5 | mAP@.5:.95 | Best so far |
 |:--:|:--:|:--:|:--:|:--:|
 | 1 | 0.000 | 0.000 | 0.000 | 0.000 |
 | 2 | 0.000 | 0.000 | 0.000 | 0.000 |
-| 3 | 0.0369 | 0.073 | 0.0369 | 0.0369 |
-| 4 | 0.0206 | 0.053 | 0.0206 | 0.0369 |
-| 5 | 0.0995 | 0.166 | 0.0995 | 0.0995 |
-| 6 | 0.0240 | 0.055 | 0.0240 | 0.0995 |
-| 7 | 0.0167 | 0.050 | 0.0167 | 0.0995 |
-| 8 | **0.1027** | **0.218** | **0.1027** | **0.1027** |
+| 3 | 0.0006 | 0.0059 | 0.0006 | 0.0006 |
+| 4 | 0.0006 | 0.0025 | 0.0006 | 0.0006 |
+| 5 | 0.000 | 0.000 | 0.000 | 0.0006 |
+| 6 | 0.0074 | 0.0184 | 0.0074 | 0.0074 |
+| 7 | **0.0308** | **0.0942** | **0.0308** | **0.0308** |
+| 8 | 0.0047 | 0.0158 | 0.0047 | 0.0308 |
 
-The **best-so-far** curve rises monotonically (0 → 0.037 → 0.0995 → **0.1027**):
-the GA found progressively better hyperparameter genomes, ending **~2.8×** above
-its first non-zero genome. Individual generations bounce around (e.g. gen 7 =
-0.017) — that is mutation *exploring*; selection keeps the best regardless. The
-winning genome (`reports/best_hyperparameters.yaml`) shifted the box-loss weight
-to **10.79** (from a 7.5 default), nudged augmentation (`hsv`, `translate`,
-`scale`) and warmup — an automatically discovered configuration, not a guessed
-one.
+The **best-so-far** curve rises monotonically (0 → 0.0006 → 0.0074 → **0.0308**):
+the GA found progressively better hyperparameter genomes, peaking at generation 7.
+Individual generations bounce around (e.g. gen 8 drops back to 0.0047 after the
+gen-7 peak) — that is mutation *exploring*; selection keeps the best regardless.
+The absolute fitness is tiny and noisy by design — 3 epochs on just 8 images — so
+the point is the *mechanism*, not the score. The winning genome
+(`reports/best_hyperparameters.yaml`) shifted the box-loss weight to **11.51**
+(from a 7.5 default), nudged augmentation (`hsv`, `translate`, `scale`) and warmup
+— an automatically discovered configuration, not a guessed one.
 
 
 **What the results mean.**
@@ -163,7 +164,7 @@ problem; this project adds the outer, evolutionary layer.
 ## 7. Technological description
 
 - **Development environment:** Python 3.13.7, managed with `uv`; VS Code.
-- **Library stack:** Ultralytics (YOLOv8 + the genetic tuner), PyTorch +
+- **Library stack:** Ultralytics (YOLO26 + the genetic tuner), PyTorch +
   torchvision, pycocotools, matplotlib; the existing `objdetect` package is
   reused for config/seed and the data subset definition.
 - **Hardware:** smoke runs on Apple Silicon (MPS); the full evolution is intended

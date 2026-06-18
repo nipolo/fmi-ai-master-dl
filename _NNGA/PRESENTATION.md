@@ -21,7 +21,7 @@ Borislav Valkov
 
 - **Object detection:** given an everyday image, find *what* objects are present
   **and** *where* (bounding boxes).
-- The neural network is **YOLOv8n** — the one-stage detector from my Deep
+- The neural network is **YOLO26n** — the one-stage detector from my Deep
   Learning project.
 - **The new goal here:** don't hand-pick the network's hyperparameters —
   let a **genetic algorithm evolve them**, scored by the network's own accuracy.
@@ -61,9 +61,9 @@ Borislav Valkov
 
 | | |
 |--|--|
-| Network | **YOLOv8n** — one-stage, anchor-free |
-| Backbone / neck | CSPDarknet + PAN |
-| Parameters | ~3.2 M |
+| Network | **YOLO26n** — one-stage, anchor-free |
+| Architecture | Latest Ultralytics YOLO (YOLO26) |
+| Parameters | ~2.4 M |
 | Optimizer | AdamW, COCO-pretrained init |
 | Evolved hyperparameters | `lr0`, `lrf`, momentum, weight decay, warmup, box/cls/dfl loss weights, HSV/translate/scale/flip/mosaic/mixup |
 
@@ -112,9 +112,9 @@ genetic algorithm.
 - The best genome is saved to `reports/best_hyperparameters.yaml` — the
   hyperparameters to use for a final training run.
 
-- Smoke run: **8 generations**, best fitness **0.000 → 0.103** (best-so-far rises
-  monotonically; the winning genome raised box-loss weight to 10.8 and tuned
-  augmentation).
+- Smoke run: **8 generations**, best fitness **0.000 → 0.0308** (best-so-far rises
+  monotonically, peaks at gen 7; the winning genome raised box-loss weight to 11.5
+  and tuned augmentation). Values are tiny/noisy by design — 3 epochs on 8 images.
 
 ---
 
@@ -142,7 +142,7 @@ genetic algorithm.
 ## Technological description (технологично описание)
 
 - **Environment:** Python 3.13.7, managed with `uv`; VS Code.
-- **Library stack:** Ultralytics (YOLOv8 + genetic tuner), PyTorch /
+- **Library stack:** Ultralytics (YOLO26 + genetic tuner), PyTorch /
   torchvision, pycocotools, matplotlib. Reuses my `objdetect` package for
   config, seed, and the class subset.
 - **Hardware:** Apple Silicon (MPS) for smoke runs; CUDA GPU (AWS / Colab,

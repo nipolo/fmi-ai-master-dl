@@ -14,7 +14,7 @@ from objdetect.models.base import Detection, Detector
 # Friendly label -> (builder name, kwargs) for the models the app offers.
 AVAILABLE_MODELS = {
     "Faster R-CNN (two-stage)": ("faster_rcnn", {}),
-    "YOLOv8n (one-stage)": ("yolo", {"weights": "yolov8n.pt"}),
+    "YOLO26n (one-stage)": ("yolo", {"weights": "yolo26n.pt"}),
 }
 
 

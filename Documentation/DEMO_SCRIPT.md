@@ -24,7 +24,7 @@ COCO sample (`DATA/coco/val2017/000000000139.jpg`).
 1. Problem & the two detector families (slides 1-4).
 2. Data: show the class-imbalance and object-size figures, name the anomalies
    and how you filter them (slides 5-6).
-3. Results table — say the headline out loud: *"YOLO is ~10× faster and ~13×
+3. Results table — say the headline out loud: *"YOLO is ~18× faster and ~17×
    smaller; Faster R-CNN is more reliable at loose IoU; overall mAP is tied."*
    (slide 7).
 4. Show the side-by-side detection image (slide 8).
@@ -37,7 +37,7 @@ COCO sample (`DATA/coco/val2017/000000000139.jpg`).
 uv run streamlit run src/objdetect/app/main.py
 ```
 1. Upload the street scene → model = Faster R-CNN → point out boxes + table.
-2. Switch model to YOLOv8n on the same image → note it's faster, fewer/cleaner
+2. Switch model to YOLO26n on the same image → note it's faster, fewer/cleaner
    boxes.
 3. Drag the confidence slider up → fewer detections; explain the precision/recall
    trade-off.

@@ -1,31 +1,31 @@
-# 8/8 iterations complete ✅ (147.02s)
-# Results saved to /Users/bvalkov-mac/Documents/Projects/Python/DL-Project/NNGA/runs/ga_evolution
-# Best fitness=0.10271 observed at iteration 8
-# Best fitness metrics are {'metrics/precision(B)': 0.16899, 'metrics/recall(B)': 0.38333, 'metrics/mAP50(B)': 0.21772, 'metrics/mAP50-95(B)': 0.10271, 'val/box_loss': 3.68404, 'val/cls_loss': 3.9615, 'val/dfl_loss': 1.9225, 'fitness': 0.10271}
-# Best fitness model is /Users/bvalkov-mac/Documents/Projects/Python/DL-Project/NNGA/runs/ga_evolution/weights
+# 8/8 iterations complete ✅ (147.16s)
+# Results saved to /Users/bvalkov-mac/Documents/Projects/Python/DL-Project/_NNGA/runs/ga_evolution
+# Best fitness=0.03077 observed at iteration 7
+# Best fitness metrics are {'metrics/precision(B)': 0.00804, 'metrics/recall(B)': 0.2, 'metrics/mAP50(B)': 0.09417, 'metrics/mAP50-95(B)': 0.03077, 'val/box_loss': 3.78661, 'val/cls_loss': 10.88252, 'val/dfl_loss': 0.01767, 'fitness': 0.03077}
+# Best fitness model is /Users/bvalkov-mac/Documents/Projects/Python/DL-Project/_NNGA/runs/ga_evolution/weights
 lr0: 0.01
 lrf: 0.01
-momentum: 0.97752
-weight_decay: 0.0
-warmup_epochs: 5.0
-warmup_momentum: 0.85992
-box: 10.79219
-cls: 0.38697
-cls_pw: 0.0014
-dfl: 1.18567
-hsv_h: 0.02878
-hsv_s: 0.68427
-hsv_v: 0.26488
-degrees: 0.0
-translate: 0.15416
-scale: 0.87942
-shear: 0.00781
+momentum: 0.93228
+weight_decay: 0.001
+warmup_epochs: 2.30747
+warmup_momentum: 0.76131
+box: 11.51363
+cls: 0.89736
+cls_pw: 0.01046
+dfl: 1.05927
+hsv_h: 0.01134
+hsv_s: 0.9
+hsv_v: 0.3854
+degrees: 0.02027
+translate: 0.05127
+scale: 0.47496
+shear: 0.00331
 perspective: 0.001
-flipud: 0.0026
-fliplr: 0.51257
-bgr: 0.01415
-mosaic: 1.0
-mixup: 0.01339
-cutmix: 0.01352
-copy_paste: 0.01092
-close_mosaic: 10
+flipud: 0.01069
+fliplr: 0.5483
+bgr: 0.01346
+mosaic: 0.87439
+mixup: 0.02748
+cutmix: 0.06735
+copy_paste: 0.0
+close_mosaic: 9
