@@ -1,9 +1,4 @@
-"""App-facing inference helpers, kept free of any Streamlit imports.
-
-Separating this logic from ``main.py`` is what makes the user interface
-testable: the BDD and unit tests drive these functions directly, exactly as
-the Streamlit callbacks do, without spinning up a browser.
-"""
+"""App-facing inference helpers, kept free of any Streamlit imports."""
 
 import pandas as pd
 from PIL.Image import Image

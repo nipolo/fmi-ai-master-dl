@@ -1,6 +1,6 @@
-"""Unit tests for the EDA utilities (Requirement 2).
+"""Unit tests for the EDA utilities
 
-Course-exercise style. A tiny fake COCO object provides three annotations so
+A tiny fake COCO object provides three annotations so
 the analysis functions can be checked without downloading the dataset.
 """
 
@@ -22,12 +22,27 @@ class _FakeCoco:
             11: {"id": 11, "width": 200, "height": 100},
         }
         self._anns = {
-            100: {"id": 100, "image_id": 10, "category_id": 1,
-                  "bbox": [0, 0, 50, 80], "iscrowd": 0},
-            101: {"id": 101, "image_id": 10, "category_id": 2,
-                  "bbox": [10, 10, 2, 2], "iscrowd": 0},
-            102: {"id": 102, "image_id": 11, "category_id": 1,
-                  "bbox": [0, 0, 199, 5], "iscrowd": 1},
+            100: {
+                "id": 100,
+                "image_id": 10,
+                "category_id": 1,
+                "bbox": [0, 0, 50, 80],
+                "iscrowd": 0,
+            },
+            101: {
+                "id": 101,
+                "image_id": 10,
+                "category_id": 2,
+                "bbox": [10, 10, 2, 2],
+                "iscrowd": 0,
+            },
+            102: {
+                "id": 102,
+                "image_id": 11,
+                "category_id": 1,
+                "bbox": [0, 0, 199, 5],
+                "iscrowd": 1,
+            },
         }
 
     def getCatIds(self, catNms=None):
@@ -50,7 +65,6 @@ class _FakeCoco:
 
 
 class TestAnnotationsFrame(unittest.TestCase):
-
     def test_when_built_then_one_row_per_annotation_with_derived_fields(self):
         # Arrange
         coco = _FakeCoco()
@@ -70,7 +84,6 @@ class TestAnnotationsFrame(unittest.TestCase):
 
 
 class TestClassDistribution(unittest.TestCase):
-
     def test_when_computed_then_person_has_two_instances(self):
         # Arrange
         coco = _FakeCoco()
@@ -88,7 +101,6 @@ class TestClassDistribution(unittest.TestCase):
 
 
 class TestFindAnomalies(unittest.TestCase):
-
     def test_when_scanned_then_flags_tiny_crowd_and_extreme_boxes(self):
         # Arrange
         coco = _FakeCoco()

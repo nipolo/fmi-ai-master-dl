@@ -1,7 +1,4 @@
-"""Unit tests for the app-facing inference helpers (Requirement 6).
-
-Course-exercise style: unittest.TestCase, Arrange / Act / Assert.
-Uses the FakeDetector from conftest so no model weights are needed.
+"""Unit tests for the app-facing inference helpers.
 
 The ``detections_to_frame`` and ``summarize_counts`` behaviours are described
 by Gherkin scenarios in ``tests/features/app_workflow.feature`` instead, so they
@@ -37,7 +34,6 @@ def _make_image() -> Image.Image:
 
 
 class TestRunDetection(unittest.TestCase):
-
     def test_when_threshold_low_then_returns_sorted_by_score(self):
         # Arrange
         detector = FakeDetector()
@@ -73,7 +69,6 @@ class TestRunDetection(unittest.TestCase):
 
 
 class TestSelectDetections(unittest.TestCase):
-
     def test_when_no_rows_selected_then_returns_all_detections(self):
         # Arrange
         detections = _three_detections()

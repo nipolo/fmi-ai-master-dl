@@ -1,4 +1,4 @@
-"""Unit tests for detection drawing (course-exercise style)."""
+"""Unit tests for detection drawing"""
 
 import unittest
 
@@ -14,7 +14,6 @@ def _blank_image() -> Image.Image:
 
 
 class TestDrawDetections(unittest.TestCase):
-
     def test_when_drawing_then_returns_same_size_rgb_image(self):
         # Arrange
         image = _blank_image()

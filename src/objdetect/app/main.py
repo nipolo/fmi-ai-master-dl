@@ -1,11 +1,10 @@
-"""Streamlit web application for object detection (Requirement 6).
+"""Streamlit web application for object detection.
 
-Run with:  uv run streamlit run src/objdetect/app/main.py
+Run with:  uv run streamlit run src/objdetect/app/main.py // VS Code Task -> run:app
 
 The UI lets the user upload an everyday photo, pick a detector, set a
-confidence threshold, and see the detected objects drawn on the image with a
-table and per-class counts. All real work lives in ``inference.py`` so this
-file stays a thin presentation layer.
+confidence threshold and see the detected objects drawn on the image with a
+table and per-class counts.
 """
 
 import streamlit as st
@@ -29,13 +28,7 @@ def _get_model(display_name: str):
 
 
 def _hide_streamlit_chrome() -> None:
-    """Hide the Deploy button and ⋮ menu, but keep the sidebar expand control.
-
-    These are irrelevant for a self-hosted demo. We target the two controls
-    specifically rather than the whole toolbar — the sidebar expand (») button
-    lives there too, and hiding all of it leaves a collapsed sidebar with no
-    way to reopen it.
-    """
+    """Hide the Deploy button and ⋮ menu, but keep the sidebar expand control."""
     st.markdown(
         """
         <style>
@@ -68,14 +61,10 @@ def main() -> None:
     _hide_streamlit_chrome()
 
     st.title("🔍 Object Detection in Everyday Images")
-    st.caption(
-        "Deep Learning course project — compare a two-stage detector "
-        "(Faster R-CNN) with a one-stage detector (YOLO) on your own photos."
-    )
 
     model_name, score_threshold = _render_sidebar()
 
-    # --- Upload (nothing to do until the user provides an image) ---
+    # --- Upload section ---
     uploaded = st.file_uploader(
         "Upload an image", type=["jpg", "jpeg", "png", "bmp", "webp"]
     )

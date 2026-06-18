@@ -1,8 +1,4 @@
-"""Unit tests for the LR schedulers (Requirement 5).
-
-Written in the course-exercise style: unittest.TestCase, one class per unit,
-explicit Arrange / Act / Assert sections, expected_/actual_ naming.
-"""
+"""Unit tests for the LR schedulers"""
 
 import unittest
 
@@ -10,7 +6,6 @@ from objdetect.training.schedulers import build_scheduler, sample_lr_curve
 
 
 class TestSampleLrCurveStep(unittest.TestCase):
-
     def test_when_step_decay_then_drops_by_gamma_every_step_size(self):
         # Arrange
         epochs = 9
@@ -37,7 +32,6 @@ class TestSampleLrCurveStep(unittest.TestCase):
 
 
 class TestSampleLrCurveCosine(unittest.TestCase):
-
     def test_when_cosine_annealing_then_decreases_from_base_to_near_min(self):
         # Arrange
         epochs = 12
@@ -60,7 +54,6 @@ class TestSampleLrCurveCosine(unittest.TestCase):
 
 
 class TestBuildScheduler(unittest.TestCase):
-
     def test_when_unknown_name_then_raises_value_error(self):
         # Arrange
         import torch

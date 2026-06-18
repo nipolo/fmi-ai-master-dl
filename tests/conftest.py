@@ -1,14 +1,10 @@
-"""Shared pytest fixtures and lightweight test doubles.
+"""Shared lightweight test doubles.
 
 These let the whole suite run fast and offline: no model weights are
 downloaded and no COCO images are needed. A ``FakeDetector`` stands in for the
 real Faster R-CNN / YOLO wrappers wherever a test only cares about the
 detection plumbing, not the neural network itself.
 """
-
-import numpy as np
-import pytest
-from PIL import Image
 
 from objdetect.models.base import Detection
 
@@ -27,16 +23,3 @@ class FakeDetector:
 
     def predict(self, image, score_threshold: float = 0.5) -> list[Detection]:
         return [d for d in self._detections if d.score >= score_threshold]
-
-
-@pytest.fixture
-def fake_detector() -> FakeDetector:
-    return FakeDetector()
-
-
-@pytest.fixture
-def sample_image() -> Image.Image:
-    """A small deterministic RGB image (no disk or network needed)."""
-    rng = np.random.default_rng(42)
-    array = rng.integers(0, 256, size=(240, 320, 3), dtype=np.uint8)
-    return Image.fromarray(array, mode="RGB")

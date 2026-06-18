@@ -24,16 +24,15 @@ A web application that detects objects in everyday photos, backed by experiments
 | `src/objdetect/`         | the package: `data`, `models`, `training`, `evaluation`, `app`         |
 | `scripts/`               | one-command entry points (download, EDA, train, evaluate, benchmark)   |
 | `notebooks/01_eda.ipynb` | interactive data exploration                                           |
-| `tests/`                 | exercise-style `unittest` + `pytest-bdd` BDD tests                     |
+| `tests/`                 | `unittest` + `pytest-bdd` BDD tests                     |
 | `reports/`               | literature review, EDA report, **model report**, presentation, figures |
-| `Documentation/`         | requirements PDF, project plan, **learning plan**                      |
+| `Documentation/`         | requirements PDF                      |
 
 ## Setup
 
 ### 1. Install uv
 
-This project is managed with [uv](https://docs.astral.sh/uv/). Install it once
-(see the [official guide](https://docs.astral.sh/uv/getting-started/installation/)):
+This project is managed with [uv](https://docs.astral.sh/uv/). Install it once (see the [official guide](https://docs.astral.sh/uv/getting-started/installation/)):
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh   # macOS / Linux
@@ -48,11 +47,9 @@ uv sync            # create .venv/ and install everything (runtime + dev deps)
 uv run pytest      # run the test suite (should be all green)
 ```
 
-If you prefer an activated shell, `source .venv/bin/activate` (and `deactivate` to exit) works too.
-
 ### 3. Notebooks
 
-Select the `.venv` interpreter as the Jupyter kernel (VS Code: kernel picker → Python Environments → `.venv`); the system Python won't have the project installed, so its cells will fail on the first import.
+Select the `.venv` interpreter as the Jupyter kernel.
 
 ## Common commands
 
@@ -94,5 +91,3 @@ Pre-configured tasks and debug profiles live in `.vscode/`.
 | Debug current Python file       | the file open in the editor           |
 | Debug script: train.py (cosine) | `scripts/train.py` with example args  |
 | Debug Streamlit app             | the Streamlit app, breakpoints active |
-
-Make sure the `.venv` interpreter is selected (`Cmd+Shift+P` → _Python: Select Interpreter_ → `.venv`) so tasks and the debugger use the project environment.
