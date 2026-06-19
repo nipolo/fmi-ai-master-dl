@@ -79,26 +79,39 @@ mosaic, mixup). ~20 genes in total.
 
 **Fitness function.** Each genome is decoded by *training the YOLO network* with
 those hyperparameters and then *evaluating it* on the validation set. Fitness is
-Ultralytics' default detection score:
+Ultralytics' default detection score — in this version (8.4.66) the weights are
+hardcoded to `[0, 0, 0, 1]` over `[P, R, mAP@0.5, mAP@0.5:0.95]`, i.e.:
 
 ```
-fitness = 0.1 · mAP@0.5 + 0.9 · mAP@0.5:0.95
+fitness = mAP@0.5:0.95
 ```
+
+(Older YOLOv5-era docs describe a `0.1·mAP@0.5 + 0.9·mAP@0.5:0.95` blend; this
+release uses pure mAP@0.5:0.95 — see `ultralytics/utils/metrics.py:fitness`.)
 
 This is the synergism: the **GA cannot score a genome without running the neural
 network**, and the **network's hyperparameters come from the GA** — neither part
 works alone.
 
-**The GA loop** (one *iteration* = one generation):
+**The GA loop** (one *iteration* = one generation). This is a **steady-state
+genetic algorithm**: every evaluated genome is kept in an ever-growing archive
+(`tune_results.ndjson`), and each iteration breeds and evaluates **one** new
+child from the best of that archive (no fixed generational population):
 
-1. **Selection** — pick the best previous genome(s) by fitness (weighted choice
-   over the top results so far).
-2. **Mutation** — Gaussian mutation: each gene is perturbed with ~80 %
-   probability by a sampled gain, then clipped to its allowed range. (This tuner
-   is mutation-driven — an evolutionary strategy, no crossover.)
-3. **Evaluation** — train the network with the child genome, compute fitness.
-4. **Record & repeat** — append to `tune_results.ndjson`; the best genome so far is
+1. **Selection** — fitness-proportional ("roulette-wheel") pick of parents from
+   the **top-9** genomes in the archive (`Tuner._crossover`).
+2. **Crossover** — **BLX-α crossover**: blend the selected parents' genes within
+   their min–max range (± a margin α).
+3. **Mutation** — log-normal Gaussian mutation: each gene is perturbed with ~50 %
+   probability (default `mutation=0.5`) by a sampled gain, then clipped to its
+   allowed range. `sigma` decays 0.2 → 0.1 over the first 300 iterations.
+4. **Evaluation** — train the network with the child genome, compute fitness.
+5. **Record & repeat** — append to `tune_results.ndjson`; the best genome so far is
    saved to `best_hyperparameters.yaml`.
+
+So it is a genuine **three-operator GA** (selection + crossover + mutation), not a
+crossover-free evolution strategy — verified directly in
+`ultralytics/engine/tuner.py` for this release (8.4.66).
 
 **Settings / conditions used** (the slide asks for this explicitly):
 
@@ -107,8 +120,8 @@ works alone.
 | Generations (`--iterations`) | 8 | 20 | 100 |
 | Epochs per individual (`--epochs`) | 3 | 10 | 30 |
 | Dataset | coco8 (8 imgs) | traffic-cone (1 class) | COCO 10-class subset |
-| Mutation probability | 0.8 (Ultralytics default) | 0.8 | 0.8 |
-| Selection | weighted top-k parents | weighted top-k parents | weighted top-k parents |
+| Mutation probability | 0.5 (Ultralytics default) | 0.5 | 0.5 |
+| Selection | weighted top-9 parents | weighted top-9 parents | weighted top-9 parents |
 | Device | Apple Silicon MPS | Apple M3 (MPS) | CUDA GPU |
 | Seed | 42 | 42 | 42 |
 
@@ -191,11 +204,11 @@ evolution chose to weight *classification / box-quality* over raw box loss for
 this easy, single-class target. An automatically discovered configuration, not a
 guessed one.
 
-> **Note on the fitness number.** Ultralytics' tuner logs a scalar `fitness`; in
-> this run it equals **mAP@.5:.95** exactly (the two columns are identical), not
-> the 0.1·mAP@.5 + 0.9·mAP@.5:.95 blend named in §4. Either way it *is* the
-> network's own validation accuracy — the synergism holds: no genome can be scored
-> without training and validating the network.
+> **Note on the fitness number.** Consistent with §4, the logged scalar `fitness`
+> equals **mAP@.5:.95** exactly (the two columns are identical) — this release
+> weights fitness `[0, 0, 0, 1]`, so the blend some docs mention does not apply.
+> Either way it *is* the network's own validation accuracy — the synergism holds:
+> no genome can be scored without training and validating the network.
 
 **What the results mean.**
 

@@ -21,11 +21,17 @@ and COCO data, and add the synergism:
   deliberately over a hand-written GA.
 - **Genome:** ~20 training hyperparameters (`lr0`, `lrf`, momentum, weight decay,
   warmup, box/cls/dfl loss weights, HSV/translate/scale/flip/mosaic/mixup).
-- **Fitness:** `0.1·mAP@0.5 + 0.9·mAP@0.5:0.95` — i.e. training+evaluating the
-  network *is* how a genome is scored. GA and NN are inseparable = the synergism.
-- **Operators:** mutation (Gaussian, ~80% of genes, then clipped) + weighted
-  selection of the best prior genome. **No crossover** — it's an evolution
-  strategy, not a textbook three-operator GA. State this precisely.
+- **Fitness:** `= mAP@0.5:0.95` exactly — Ultralytics 8.4.66 hardcodes weights
+  `[0,0,0,1]` over `[P,R,mAP@0.5,mAP@0.5:0.95]` (`metrics.py:fitness`). The
+  `0.1·mAP@0.5 + 0.9·mAP@0.5:0.95` blend is the old YOLOv5 default — do NOT cite
+  it for this version. Training+evaluating the network *is* how a genome is
+  scored ⇒ GA and NN are inseparable = the synergism.
+- **Operators (verified in `tuner.py`, 8.4.66):** fitness-proportional selection
+  from the **top-9** archive + **BLX-α crossover** + log-normal mutation (~50% of
+  genes, default `mutation=0.5`, then clipped; sigma decays 0.2→0.1 over 300
+  iters). It **IS a steady-state three-operator GA — do NOT say "no crossover"**
+  (earlier notes were wrong; the installed code calls `_crossover` every iter).
+  Steady-state = ever-growing archive, one child evaluated per iteration.
 - **Result (smoke run, 8 generations, coco8, MPS):** best-so-far fitness rose
   0 → 0.0006 → 0.0074 → **0.0308** (peak at gen 7). Tiny/noisy by design (3 epochs
   on 8 images) — demonstrates the mechanism.
@@ -39,6 +45,8 @@ and COCO data, and add the synergism:
   == mAP@.5:.95 exactly here (not the 0.1/0.9 blend). All three figures
   (`ga_fitness_evolution.png`, `tune_fitness.png`, `tune_scatter_plots.png`) now
   show the cone run. An even-larger COCO-subset run is the identical command on a GPU.
+- **Gotcha:** `fitness` logged == mAP@.5:.95 exactly (weights `[0,0,0,1]`), which
+  is why the blend in older docs does not match — consistent across all `_NNGA` docs now.
 
 ## Deliverables (under `_NNGA/`)
 

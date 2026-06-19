@@ -69,7 +69,16 @@ Borislav Valkov
 | Optimizer | AdamW, COCO-pretrained init |
 | Evolved hyperparameters | `lr0`, `lrf`, momentum, weight decay, warmup, box/cls/dfl loss weights, HSV/translate/scale/flip/mosaic/mixup |
 
-The ~20 evolved hyperparameters form one **genome**.
+The ~20 evolved hyperparameters form one **genome**. What the high-leverage genes do:
+
+- `lr0` / `lrf` — learning-rate start & final-factor (the LR schedule).
+- `box` / `cls` / `dfl` — the three detection-loss weights (box regression,
+  classification, box-quality); the GA's win came from **rebalancing these**.
+- `momentum`, `weight_decay`, `warmup_*` — optimizer dynamics.
+- `hsv_*`, `translate`, `scale`, `fliplr`, `mosaic`, `mixup` — augmentation strengths.
+
+**Backprop trains the network's weights; the GA tunes these knobs above it** — a
+different optimizer for a different layer of the problem (next slide).
 
 ---
 
@@ -77,15 +86,30 @@ The ~20 evolved hyperparameters form one **genome**.
 
 **The loop (one iteration = one generation):**
 
-1. **Selection** — pick the best previous genome(s) by fitness.
-2. **Mutation** — Gaussian perturbation of ~80 % of genes, then clip to range.
-3. **Evaluation** — *train the YOLO network* with that genome, *measure mAP*.
-4. **Record & repeat** — keep the best-so-far genome.
+1. **Selection** — fitness-proportional pick from the top-9 genomes so far.
+2. **Crossover** — blend the selected parents' genes (BLX-α).
+3. **Mutation** — Gaussian perturbation of ~50 % of genes, then clip to range.
+4. **Evaluation** — *train the YOLO network* with that genome, *measure mAP*.
+5. **Record & repeat** — keep the best-so-far genome.
 
-**Fitness = 0.1 · mAP@0.5 + 0.9 · mAP@0.5:0.95**
+**Fitness = mAP@0.5:0.95**  (Ultralytics default weights `[0, 0, 0, 1]`)
 
 > The GA can't score a genome without running the network; the network's
 > hyperparameters come from the GA. **Neither works alone — that's the synergism.**
+
+---
+
+## Why a GA — and not gradient descent? (защо ГА)
+
+- Backprop trains the network's **weights** (~2.4 M) from the **gradient of the
+  loss** — it runs inside every training step.
+- But the **hyperparameters** (LR, loss weights, augmentation) govern *how* that
+  training runs, and **validation mAP is non-differentiable** — it only exists
+  *after* a full training run. You can't backprop through "train 10 epochs, then
+  measure mAP."
+- So gradient descent **can't** tune these knobs; a **black-box evolutionary
+  search (the GA) can**. The two are **nested**: the GA's outer loop wraps
+  backprop's inner loop. *That coupling is the synergism.*
 
 ---
 
@@ -96,13 +120,13 @@ The ~20 evolved hyperparameters form one **genome**.
 | Generations | 8 | 20 | 100 |
 | Epochs / individual | 3 | 10 | 30 |
 | Dataset | coco8 (8 imgs) | traffic-cone (1 class) | COCO 10-class subset |
-| Mutation prob. | 0.8 | 0.8 | 0.8 |
-| Selection | weighted top-k | weighted top-k | weighted top-k |
+| Mutation prob. | 0.5 | 0.5 | 0.5 |
+| Selection | weighted top-9 | weighted top-9 | weighted top-9 |
 | Device | Apple MPS | **Apple M3 (MPS)** | CUDA GPU |
 | Seed | 42 | 42 | 42 |
 
-Tool: Ultralytics' built-in evolutionary tuner (`YOLO.tune`) — a mutation-driven
-genetic algorithm.
+Tool: Ultralytics' built-in evolutionary tuner (`YOLO.tune`) — a steady-state
+genetic algorithm (selection + BLX-α crossover + mutation).
 
 ---
 

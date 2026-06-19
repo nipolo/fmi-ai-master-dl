@@ -1,18 +1,12 @@
 # NNGA — Evolving an Object Detector with a Genetic Algorithm
 
-Course work for **Neural Networks & Genetic Algorithms**, variant *"със
-синергизъм"* (with synergism). It is a **derived project**: it reuses the
-object-detection neural network, COCO data, and EDA from the Deep Learning course
-project (Topic 4, in the repository root) and adds the synergism this course
-requires —
+Course work for **Neural Networks & Genetic Algorithms**, variant *"със синергизъм"* (with synergism). It is a **derived project**: it reuses the object-detection neural network, COCO data, and EDA from the Deep Learning course project (Topic 4, in the repository root) and adds the synergism this course requires —
 
-> a **genetic algorithm** searches the detector's hyperparameters, using the
-> **network's validation mAP as the fitness function**.
+> a **genetic algorithm** searches the detector's hyperparameters, using the **network's validation mAP as the fitness function**.
 
 ## What maps to the course requirements
 
-The grading slide (`Documentation/Project Requirements.pdf`, "Формат на курсовите
-работи — Вариант със синергизъм") asks for these; here is where each lives:
+The grading slide (`Documentation/Project Requirements.pdf`, "Формат на курсовите работи — Вариант със синергизъм") asks for these; here is where each lives:
 
 | Requirement (slide) | Where |
 |--|--|
@@ -46,6 +40,8 @@ _NNGA/
 
 ## Reproduce
 
+> **Derived project / standalone note.** This folder ships as part of the parent Deep Learning repo and the commands below are meant to be run from its root (where `uv` and the `objdetect` package are set up). The two scripts themselves are standalone — they need only `ultralytics`, `torch` and `matplotlib`, and `evolve_hyperparameters.py` falls back to seed 42 if `objdetect` is absent — but faithfully reproducing the **full** run (especially the traffic-cone dataset, laid out by the parent repo's `scripts/prepare_cone_dataset.py`) expects that parent environment. The committed results, figures and `best_hyperparameters.yaml` let the report and presentation stand on their own without rerunning anything.
+
 From the repository root (the `objdetect` env is already set up — `uv sync` if not):
 
 ```bash
@@ -66,18 +62,10 @@ uv run python _NNGA/src/evolve_hyperparameters.py --data <coco-subset>.yaml \
     --epochs 30 --iterations 100 --device 0
 ```
 
-> The traffic-cone dataset is laid out by the DL project's
-> `scripts/prepare_cone_dataset.py` into `DATA/traffic_cone/` (see DL
-> `reports/MODEL_REPORT.md` §7). Run that once if the folder is absent.
+> The traffic-cone dataset is laid out by the DL project's `scripts/prepare_cone_dataset.py` into `DATA/traffic_cone/` (see DL `reports/MODEL_REPORT.md` §7). Run that once if the folder is absent.
 
-The GA writes `tune_results.ndjson`, `best_hyperparameters.yaml`, and fitness plots,
-which the script copies into `reports/`.
+The GA writes `tune_results.ndjson`, `best_hyperparameters.yaml`, and fitness plots, which the script copies into `reports/`.
 
 ## Relationship to the DL project
 
-This is intentionally a thin, focused layer on top of the DL project. The neural
-network (YOLO26n), the COCO data, the EDA, and now the DL project's **traffic-cone
-dataset** (its §7 single-class extension, reused here as a small on-device GA
-target) are shared; the only new idea is the **evolutionary hyperparameter
-search**. Submitting a derived project across both courses is permitted for this
-course.
+This is intentionally a thin, focused layer on top of the DL project. The neural network (YOLO26n), the COCO data, the EDA, and now the DL project's **traffic-cone dataset** (its §7 single-class extension, reused here as a small on-device GA target) are shared; the only new idea is the **evolutionary hyperparameter search**. Submitting a derived project across both courses is permitted for this course.
