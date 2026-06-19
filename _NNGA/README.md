@@ -55,10 +55,20 @@ uv run python _NNGA/src/evolve_hyperparameters.py --data coco8.yaml --epochs 3 -
 # 2) Make the presentation fitness curve from the GA's results table:
 uv run python _NNGA/src/plot_evolution.py
 
-# Full run (a real search; on a CUDA GPU, identical command otherwise):
+# Real, on-device run on the DL project's traffic-cone dataset (Apple M3, no GPU).
+# Small single-class set -> the whole evolution runs on the laptop and earns
+# meaningful (non-toy) fitness. ~1-1.5 h for 20 generations; scale down freely:
+uv run python _NNGA/src/evolve_hyperparameters.py \
+    --data DATA/traffic_cone/traffic_cone.yaml --epochs 10 --iterations 20 --device mps
+
+# Even-larger run (a CUDA GPU, identical command otherwise):
 uv run python _NNGA/src/evolve_hyperparameters.py --data <coco-subset>.yaml \
     --epochs 30 --iterations 100 --device 0
 ```
+
+> The traffic-cone dataset is laid out by the DL project's
+> `scripts/prepare_cone_dataset.py` into `DATA/traffic_cone/` (see DL
+> `reports/MODEL_REPORT.md` §7). Run that once if the folder is absent.
 
 The GA writes `tune_results.ndjson`, `best_hyperparameters.yaml`, and fitness plots,
 which the script copies into `reports/`.
@@ -66,6 +76,8 @@ which the script copies into `reports/`.
 ## Relationship to the DL project
 
 This is intentionally a thin, focused layer on top of the DL project. The neural
-network (YOLO26n), the COCO data, and the EDA are shared; the only new idea is
-the **evolutionary hyperparameter search**. Submitting a derived project across
-both courses is permitted for this course.
+network (YOLO26n), the COCO data, the EDA, and now the DL project's **traffic-cone
+dataset** (its §7 single-class extension, reused here as a small on-device GA
+target) are shared; the only new idea is the **evolutionary hyperparameter
+search**. Submitting a derived project across both courses is permitted for this
+course.

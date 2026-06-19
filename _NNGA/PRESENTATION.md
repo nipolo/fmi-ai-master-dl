@@ -33,6 +33,8 @@ Borislav Valkov
 
 - **COCO** — Common Objects in Context. 80 classes, everyday scenes.
 - 🔗 **Link to the data:** https://cocodataset.org
+- **Traffic-cone** (real on-device run) — single class, not in COCO's 80.
+- 🔗 **Link to the data:** https://github.com/krisstern/traffic-cone-image-dataset
 - From my EDA of COCO val2017 (4 952 images, 36 781 boxes):
   - **Severe imbalance** — person 11 004 vs toaster 9 instances (~1 200:1).
   - **Cluttered** — 7.4 objects per image on average (up to 63).
@@ -89,15 +91,15 @@ The ~20 evolved hyperparameters form one **genome**.
 
 ## The synergism — settings & conditions (настройки, условия)
 
-| Setting | Smoke demo | Full run (GPU) |
-|--|--|--|
-| Generations | 8 | 100 |
-| Epochs / individual | 3 | 30 |
-| Dataset | coco8 (8 imgs) | COCO 10-class subset |
-| Mutation prob. | 0.8 | 0.8 |
-| Selection | weighted top-k parents | weighted top-k parents |
-| Device | Apple MPS | CUDA GPU |
-| Seed | 42 | 42 |
+| Setting | Smoke demo | Real run (on-device) | Larger run (GPU) |
+|--|--|--|--|
+| Generations | 8 | 20 | 100 |
+| Epochs / individual | 3 | 10 | 30 |
+| Dataset | coco8 (8 imgs) | traffic-cone (1 class) | COCO 10-class subset |
+| Mutation prob. | 0.8 | 0.8 | 0.8 |
+| Selection | weighted top-k | weighted top-k | weighted top-k |
+| Device | Apple MPS | **Apple M3 (MPS)** | CUDA GPU |
+| Seed | 42 | 42 | 42 |
 
 Tool: Ultralytics' built-in evolutionary tuner (`YOLO.tune`) — a mutation-driven
 genetic algorithm.
@@ -108,13 +110,14 @@ genetic algorithm.
 
 ![w:620](reports/figures/ga_fitness_evolution.png)
 
-- The GA evaluated a **population** of genomes and tracked the **best so far**.
-- The best genome is saved to `reports/best_hyperparameters.yaml` — the
-  hyperparameters to use for a final training run.
-
-- Smoke run: **8 generations**, best fitness **0.000 → 0.0308** (best-so-far rises
-  monotonically, peaks at gen 7; the winning genome raised box-loss weight to 11.5
-  and tuned augmentation). Values are tiny/noisy by design — 3 epochs on 8 images.
+- **Real on-device run** (traffic-cone, 20 generations × 10 epochs, Apple M3,
+  ~77 min): best-so-far climbs **0.392 → 0.505** (peak at gen 16) →
+  **mAP@.5 ≈ 0.78, mAP@.5:.95 ≈ 0.505** — a good single-class detector *found by
+  evolution*, on the laptop, no GPU.
+- Winning genome **rebalanced the loss**: box ↓ 4.64, cls ↑ 0.70, dfl ↑ 1.74,
+  lower `lr0`, gentler mosaic → saved to `reports/best_hyperparameters.yaml`.
+- The **coco8 smoke run** (8 gens, best 0.0308) proves the same loop in seconds —
+  tiny by design (3 epochs on 8 images).
 
 ---
 
@@ -123,19 +126,23 @@ genetic algorithm.
 ![w:760](reports/figures/tune_scatter_plots.png)
 
 - Fitness vs each gene shows **which hyperparameters matter**.
-- **Learning rate** and **augmentation strengths** are the high-leverage genes —
-  exactly what the EDA (imbalanced, small objects) predicted.
+- The **loss-weight genes** (`box`, `cls`, `dfl`) and **learning rate** are the
+  high-leverage ones here — the GA's win came from rebalancing them.
 - The GA replaces manual trial-and-error with an **accuracy-driven search**.
 
 ---
 
 ## Honesty note (for the defense)
 
-- The shown run is a **smoke demo**: 8 generations × 3 epochs on **8 images**.
+- The coco8 run is a **smoke demo**: 8 generations × 3 epochs on **8 images**.
 - It proves the **mechanism** — a working GA → network → fitness → selection
-  loop — **not** a converged, production search.
-- The **full run** (100 generations on the COCO subset) is the *identical*
-  command on a GPU. Same honesty discipline as the DL project's smoke runs.
+  loop — **not** a converged, production search (fitness stays near-zero by
+  design).
+- For a **real, non-toy** trajectory I ran the same GA on the DL project's
+  **traffic-cone** dataset (single class) — small enough to evolve **entirely on
+  the M3 laptop**, and it reached **mAP@.5:.95 ≈ 0.505** (best of 20 generations).
+- The COCO-subset run (100 generations) is the *identical* command on a GPU.
+  Same honesty discipline as the DL project's smoke runs.
 
 ---
 
@@ -145,8 +152,10 @@ genetic algorithm.
 - **Library stack:** Ultralytics (YOLO26 + genetic tuner), PyTorch /
   torchvision, pycocotools, matplotlib. Reuses my `objdetect` package for
   config, seed, and the class subset.
-- **Hardware:** Apple Silicon (MPS) for smoke runs; CUDA GPU (AWS / Colab,
-  budget ~\$20) for the full evolution.
+- **Hardware:** a **MacBook Air M3** (10-core GPU, MPS) runs both the smoke demo
+  and the real traffic-cone evolution on-device — the same laptop that fine-tuned
+  the cone detector in ~32 min. A CUDA GPU (AWS / Colab, ~\$20) is only for the
+  larger COCO-subset run.
 
 ---
 
@@ -155,8 +164,10 @@ genetic algorithm.
 - Coupled a **genetic algorithm** with an **object-detection network** into a
   real synergism: **GA proposes hyperparameters → network scores them by mAP →
   GA selects & mutates toward better ones.**
+- A **real on-device run** (traffic-cone, Apple M3) evolved the detector to
+  **mAP@.5:.95 ≈ 0.505** in 20 generations — no GPU needed.
 - End-to-end and reproducible from two `uv run` commands.
 - Built on top of my Deep Learning project — data, EDA, and YOLO network reused;
   the new, graded contribution is the **evolutionary hyperparameter search**.
 
-**Reproduce →** `uv run python _NNGA/src/evolve_hyperparameters.py --data coco8.yaml`
+**Reproduce →** smoke: `--data coco8.yaml`; real on-device: `--data DATA/traffic_cone/traffic_cone.yaml --epochs 10 --iterations 20 --device mps`

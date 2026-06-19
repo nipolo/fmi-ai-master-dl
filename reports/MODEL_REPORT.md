@@ -15,11 +15,13 @@ presentable.
 > # Extension — custom traffic-cone class (§7):
 > git clone --depth 1 https://github.com/krisstern/traffic-cone-image-dataset.git DATA/_cone_src
 > uv run python scripts/prepare_cone_dataset.py      # seeded 80/20 split + data yaml
+ # absolute project path -> run lands in DATA/runs/ (a relative path nests under
+> # Ultralytics' default runs/detect/, so pass it absolute); run from repo root:
 > uv run yolo detect train model=yolo26n.pt data=DATA/traffic_cone/traffic_cone.yaml \
 >   epochs=100 imgsz=640 batch=16 device=mps cache=disk patience=30 \
->   project=DATA/runs name=cone_yolo26n
+>   project="$PWD/DATA/runs" name=cone_yolo26n
 > # publish best weights to the path the app loads (config.CHECKPOINTS_DIR):
-> cp runs/detect/DATA/runs/cone_yolo26n/weights/best.pt DATA/checkpoints/cone_yolo26n.pt
+> cp DATA/runs/cone_yolo26n/weights/best.pt DATA/checkpoints/cone_yolo26n.pt
 > ```
 
 ## How this report follows the Model-Report-File (MRF) guidelines

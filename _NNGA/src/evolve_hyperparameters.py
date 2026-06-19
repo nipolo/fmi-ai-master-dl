@@ -20,7 +20,14 @@ Reproduce the smoke demo (fast, runs on a laptop / Apple Silicon MPS):
     uv run python _NNGA/src/evolve_hyperparameters.py \
         --data coco8.yaml --epochs 3 --iterations 10
 
-Full run (a real search; belongs on a CUDA GPU, identical command otherwise):
+Real, on-device run on the DL project's single-class traffic-cone dataset (small
+enough that the whole evolution runs on an Apple M3, yet earns meaningful, non-
+toy fitness — see DL reports/MODEL_REPORT.md §7 for the dataset):
+
+    uv run python _NNGA/src/evolve_hyperparameters.py \
+        --data DATA/traffic_cone/traffic_cone.yaml --epochs 10 --iterations 20 --device mps
+
+Even-larger run (a real COCO search; belongs on a CUDA GPU, identical otherwise):
 
     uv run python _NNGA/src/evolve_hyperparameters.py \
         --data <coco-subset>.yaml --epochs 30 --iterations 100 --device 0
