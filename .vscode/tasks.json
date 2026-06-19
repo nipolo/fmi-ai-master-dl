@@ -53,7 +53,7 @@
     {
       "label": "nnga:regen-presentation",
       "type": "shell",
-      "command": "sudo npx -y @marp-team/marp-cli@latest _NNGA/PRESENTATION.md --pptx --allow-local-files",
+      "command": "sudo marp _NNGA/PRESENTATION.md --pptx --allow-local-files",
       "detail": "Render _NNGA/PRESENTATION.md to PRESENTATION.pptx (Marp)",
       "problemMatcher": [],
       "presentation": {

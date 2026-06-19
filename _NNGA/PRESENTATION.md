@@ -2,6 +2,10 @@
 marp: true
 title: Evolving an Object Detector with a Genetic Algorithm
 paginate: true
+style: |
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; }
+  .cols img { max-width: 100%; max-height: 470px; }
+  .cols ul { font-size: 0.92em; }
 ---
 
 # Evolving an Object Detector with a Genetic Algorithm
@@ -26,16 +30,14 @@ A genetic algorithm tunes a YOLO object-detection network on COCO
 
 ## The data — what it looks like
 
-- **COCO** — Common Objects in Context. 80 classes, everyday scenes.
-- 🔗 **Link to the data:** https://cocodataset.org
-- **Traffic-cone** (real on-device run) — single class, not in COCO's 80.
-- 🔗 **Link to the data:** https://github.com/krisstern/traffic-cone-image-dataset
+- **COCO** — Common Objects in Context. 80 classes, everyday scenes — 🔗 <https://cocodataset.org>
+- **Traffic-cone** (real on-device run) — single class, not in COCO's 80 — 🔗 [dataset](https://github.com/krisstern/traffic-cone-image-dataset)
 - From my EDA of COCO val2017 (4 952 images, 36 781 boxes):
-  - **Severe imbalance** — person 11 004 vs toaster 9 instances (~1 200:1).
+  - **Severe imbalance** — person 11 004 vs toaster 9 (~1 200:1).
   - **Cluttered** — 7.4 objects per image on average (up to 63).
   - **Small-object-heavy** — 46.7 % of objects cover < 1 % of the image.
 
-![w:380](reports/figures/eda_class_distribution.png)
+![w:320](reports/figures/eda_class_distribution.png)
 
 ---
 
@@ -58,22 +60,16 @@ A genetic algorithm tunes a YOLO object-detection network on COCO
 
 | | |
 |--|--|
-| Network | **YOLO26n** — one-stage, anchor-free |
-| Architecture | Latest Ultralytics YOLO (YOLO26) |
-| Parameters | ~2.4 M |
+| Network | **YOLO26n** — one-stage, anchor-free; ~2.4 M params |
 | Optimizer | AdamW, COCO-pretrained init |
-| Evolved hyperparameters | `lr0`, `lrf`, momentum, weight decay, warmup, box/cls/dfl loss weights, HSV/translate/scale/flip/mosaic/mixup |
-
-The ~20 evolved hyperparameters form one **genome**. What the high-leverage genes do:
+| Evolved | ~20 hyperparameters = one **genome** (high-leverage genes below) |
 
 - `lr0` / `lrf` — learning-rate start & final-factor (the LR schedule).
-- `box` / `cls` / `dfl` — the three detection-loss weights (box regression,
-  classification, box-quality); the GA's win came from **rebalancing these**.
+- `box` / `cls` / `dfl` — the three detection-loss weights; the GA's win came from **rebalancing these**.
 - `momentum`, `weight_decay`, `warmup_*` — optimizer dynamics.
-- `hsv_*`, `translate`, `scale`, `fliplr`, `mosaic`, `mixup` — augmentation strengths.
+- `hsv_*`, `translate`, `scale`, `mosaic`, `mixup` — augmentation strengths.
 
-**Backprop trains the network's weights; the GA tunes these knobs above it** — a
-different optimizer for a different layer of the problem.
+**Backprop trains the weights; the GA tunes these knobs above it.**
 
 ---
 
@@ -128,45 +124,48 @@ genetic algorithm (selection + BLX-α crossover + mutation).
 
 ## Results — the GA converging
 
-![w:620](reports/figures/ga_fitness_evolution.png)
+<div class="cols">
+<div>
 
-- **Real on-device run** (traffic-cone, 20 generations × 10 epochs, Apple M3,
-  ~77 min): best-so-far climbs **0.392 → 0.505** (peak at gen 16) →
-  **mAP@.5 ≈ 0.78, mAP@.5:.95 ≈ 0.505** — a good single-class detector *found by
-  evolution*, on the laptop, no GPU.
-- Winning genome **rebalanced the loss** (box ↓, cls ↑, dfl ↑) with a lower `lr0`
-  and gentler mosaic → saved to `reports/best_hyperparameters.yaml`.
-- The **coco8 smoke run** (8 gens, best 0.0308) proves the same loop in seconds —
-  tiny by design (3 epochs on 8 images).
+![w:560](reports/figures/ga_fitness_evolution.png)
+
+</div>
+<div>
+
+- **Traffic-cone run** (20 gens × 10 epochs, Apple M3, ~77 min): best-so-far **0.392 → 0.505** (peak gen 16) → **mAP@.5 ≈ 0.78, mAP@.5:.95 ≈ 0.505** — on the laptop, no GPU.
+- Winning genome **rebalanced the loss** (box ↓, cls ↑, dfl ↑) → `best_hyperparameters.yaml`.
+- **coco8 smoke run**: same loop in seconds (best 0.0308).
+
+</div>
+</div>
 
 ---
 
 ## Results — what the search learned
 
-![w:760](reports/figures/tune_scatter_plots.png)
+<div class="cols">
+<div>
+
+![w:470](reports/figures/tune_scatter_plots.png)
+
+</div>
+<div>
 
 - Fitness vs each gene shows **which hyperparameters matter**.
-- The **loss-weight genes** (`box`, `cls`, `dfl`) and **learning rate** are the
-  high-leverage ones here — the GA's win came from rebalancing them.
+- The **loss-weight genes** (`box`, `cls`, `dfl`) and **learning rate** are the high-leverage ones — the GA's win came from rebalancing them.
 - The GA replaces manual trial-and-error with an **accuracy-driven search**.
+
+</div>
+</div>
 
 ---
 
 ## Scope & honest limitations
 
-- The coco8 run is a **smoke demo**: 8 generations × 3 epochs on **8 images**.
-- It proves the **mechanism** — a working GA → network → fitness → selection
-  loop — **not** a converged, production search (fitness stays near-zero by
-  design).
-- For a **real, non-toy** trajectory I ran the same GA on the DL project's
-  **traffic-cone** dataset (single class) — small enough to evolve **entirely on
-  the M3 laptop**, and it reached **mAP@.5:.95 ≈ 0.505** (best of 20 generations).
-- Genomes are scored at a **fixed budget** (10 epochs/individual): the winner is
-  best *for that budget*, **not guaranteed optimal for a longer final run** —
-  short training favours fast-converging settings. The evolved genome is a strong
-  recipe to verify, not a proven global optimum.
+- The coco8 run is a **smoke demo** (8 gens × 3 epochs on **8 images**): it proves the **mechanism**, not a converged search — fitness stays near-zero by design.
+- The **real result** is the traffic-cone run (single class), evolved **entirely on the M3 laptop** to **mAP@.5:.95 ≈ 0.505** (best of 20 generations).
+- Genomes are scored at a **fixed budget** (10 epochs each): the winner is best *for that budget*, **not guaranteed optimal for a longer run** — a strong recipe to verify, not a proven optimum.
 - The COCO-subset run (100 generations) is the *identical* command on a GPU.
-  Same honesty discipline as the DL project's smoke runs.
 
 ---
 

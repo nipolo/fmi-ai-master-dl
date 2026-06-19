@@ -31,7 +31,17 @@
       "Bash(uv sync *)",
       "Bash(echo \"EXIT: $?\")",
       "Bash(python3)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(which marp *)",
+      "Bash(npx --no-install marp --version)",
+      "Bash(ls PRESENTATION.pptx)",
+      "Bash(marp --version)",
+      "Bash(mkdir -p /tmp/marp_out)",
+      "Bash(marp PRESENTATION.md --images png -o /tmp/marp_out/slide.png)",
+      "Read(//tmp/**)",
+      "Bash(rm -f /tmp/marp_out/*.png)",
+      "Bash(marp PRESENTATION.md --images png --allow-local-files -o /tmp/marp_out/slide.png)",
+      "Bash(marp PRESENTATION.md --pptx --allow-local-files -o PRESENTATION.pptx)"
     ]
   }
 }
