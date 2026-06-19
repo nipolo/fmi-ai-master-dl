@@ -1,36 +1,14 @@
-"""NN ⇆ GA synergism: evolve a YOLO detector's hyperparameters with a GA.
+"""Evolve a YOLO detector's hyperparameters with a genetic algorithm.
 
-This is the core artifact for the *Neural Networks & Genetic Algorithms* course
-(variant "със синергизъм" / "with synergism"). It reuses the object-detection
-neural network from the Deep Learning project and adds the required synergism:
+Drives Ultralytics' built-in evolutionary tuner (`YOLO.tune`): each generation
+breeds a hyperparameter genome (selection + BLX-alpha crossover + mutation),
+trains YOLO with it, and scores it by validation mAP (fitness = mAP@0.5:0.95).
+The best genome and the tuner's result table/plots are copied into
+`_NNGA/reports/`.
 
-    a **genetic algorithm** searches the detector's hyperparameter space, using
-    the network's own validation **mAP as the fitness function**.
-
-We use Ultralytics' built-in evolutionary tuner (`YOLO.tune`), which is a
-genetic algorithm: each *generation* (iteration) selects the best prior
-hyperparameter genome by fitness, applies **Gaussian mutation** to produce a
-child genome, trains the network with it, and scores it. Over generations the
-population drifts toward better hyperparameters — classic NN+GA synergism.
-
-Fitness (Ultralytics default) = 0.1·mAP@0.5 + 0.9·mAP@0.5:0.95.
-
-Reproduce the smoke demo (fast, runs on a laptop / Apple Silicon MPS):
-
-    uv run python _NNGA/src/evolve_hyperparameters.py \
-        --data coco8.yaml --epochs 3 --iterations 10
-
-Real, on-device run on the DL project's single-class traffic-cone dataset (small
-enough that the whole evolution runs on an Apple M3, yet earns meaningful, non-
-toy fitness — see DL reports/MODEL_REPORT.md §7 for the dataset):
-
+Usage:
     uv run python _NNGA/src/evolve_hyperparameters.py \
         --data DATA/traffic_cone/traffic_cone.yaml --epochs 10 --iterations 20 --device mps
-
-Even-larger run (a real COCO search; belongs on a CUDA GPU, identical otherwise):
-
-    uv run python _NNGA/src/evolve_hyperparameters.py \
-        --data <coco-subset>.yaml --epochs 30 --iterations 100 --device 0
 """
 
 import argparse
@@ -66,9 +44,7 @@ def main() -> int:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument("--model", default="yolo26n.pt", help="base YOLO weights")
-    parser.add_argument(
-        "--data", default="coco8.yaml", help="Ultralytics dataset YAML"
-    )
+    parser.add_argument("--data", default="coco8.yaml", help="Ultralytics dataset YAML")
     parser.add_argument(
         "--epochs", type=int, default=3, help="training epochs per GA individual"
     )
@@ -119,15 +95,7 @@ def main() -> int:
         exist_ok=True,
     )
 
-    # Collect the GA's output (results table, best genome, fitness plots) next to
-    # the report so the presentation can cite real files. Ultralytics' `tune`
-    # ignores `exist_ok` for its run-dir naming and appends a numeric suffix
-    # (ga_evolution, ga_evolution-2, ...) when a previous run exists, so resolve
-    # the *newest* matching directory rather than assuming the bare name — else
-    # we would copy a stale earlier run's artifacts.
-    candidates = sorted(
-        RUNS_DIR.glob("ga_evolution*"), key=lambda p: p.stat().st_mtime
-    )
+    candidates = sorted(RUNS_DIR.glob("ga_evolution*"), key=lambda p: p.stat().st_mtime)
     tune_dir = candidates[-1] if candidates else RUNS_DIR / "ga_evolution"
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)

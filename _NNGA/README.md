@@ -1,32 +1,15 @@
 # NNGA — Evolving an Object Detector with a Genetic Algorithm
 
-Course work for **Neural Networks & Genetic Algorithms**, variant *"със синергизъм"* (with synergism). It is a **derived project**: it reuses the object-detection neural network, COCO data, and EDA from the Deep Learning course project (Topic 4, in the repository root) and adds the synergism this course requires —
+Course work for **Neural Networks & Genetic Algorithms**, variant with synergism. It is a **derived project**: it reuses the object-detection neural network, COCO data, and EDA from the Deep Learning course project and adds the synergism.
 
 > a **genetic algorithm** searches the detector's hyperparameters, using the **network's validation mAP as the fitness function**.
-
-## What maps to the course requirements
-
-The grading slide (`Documentation/Project Requirements.pdf`, "Формат на курсовите работи — Вариант със синергизъм") asks for these; here is where each lives:
-
-| Requirement (slide) | Where |
-|--|--|
-| Task / goal | `PRESENTATION.md` §1, `reports/GA_SYNERGISM_REPORT.md` §1 |
-| Data: what it looks like + **link** | report §2 (link: https://cocodataset.org) |
-| Data: transformations & analysis | report §2, reuses DL `reports/EDA_REPORT.md` |
-| Data: conclusions | report §2 |
-| NN: architecture, params, hyperparams | report §3 |
-| **Synergism: what / for what / how** | report §4 (the GA loop & fitness) |
-| Synergism: settings & conditions | report §4 (settings table) |
-| Results & what they mean | report §5, figures in `reports/figures/` |
-| Tech: environment, libraries, hardware | report §7 |
-| Upload: presentation + source code | `PRESENTATION.md` + this folder + repo |
 
 ## Layout
 
 ```
 _NNGA/
   README.md                      # this file
-  PRESENTATION.md                # Marp deck (the slide deck to present)
+  PRESENTATION.md                
   src/
     evolve_hyperparameters.py    # the GA × NN synergism (Ultralytics genetic tuner)
     plot_evolution.py            # fitness-vs-generation figure from the GA results

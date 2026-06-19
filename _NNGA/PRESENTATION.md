@@ -10,14 +10,9 @@ paginate: true
 
 A genetic algorithm tunes a YOLO object-detection network on COCO
 
-Borislav Valkov
-
-> Render with: `marp _NNGA/PRESENTATION.md` (or the Marp VS Code extension).
-> Figures live in `_NNGA/reports/figures/`.
-
 ---
 
-## The task (каква е целта)
+## The task
 
 - **Object detection:** given an everyday image, find *what* objects are present
   **and** *where* (bounding boxes).
@@ -29,7 +24,7 @@ Borislav Valkov
 
 ---
 
-## The data — what it looks like (как изглеждат данните)
+## The data — what it looks like
 
 - **COCO** — Common Objects in Context. 80 classes, everyday scenes.
 - 🔗 **Link to the data:** https://cocodataset.org
@@ -46,20 +41,20 @@ Borislav Valkov
 
 ## The data — transformations & conclusions
 
-**Transformations / preliminary analysis (трансформации и анализи):**
+**Transformations / preliminary analysis:**
 
 - Dropped **crowd** boxes and degenerate (≤1 px) boxes.
 - Images scaled to [0, 1]; standard YOLO augmentation (HSV, flip, mosaic…).
 
-**Conclusions (изводи):**
+**Conclusions:**
 
 - Because the data is **imbalanced and small-object-heavy**, hyperparameters
   like **learning rate** and **augmentation strength** strongly affect accuracy.
-- → They are worth **searching automatically**, not guessing — motivating the GA.
+- They are worth **searching automatically**, not guessing — motivating the GA.
 
 ---
 
-## How I solve it — the network (НМ, архитектура, хиперпараметри)
+## How I solve it — the network
 
 | | |
 |--|--|
@@ -78,11 +73,11 @@ The ~20 evolved hyperparameters form one **genome**. What the high-leverage gene
 - `hsv_*`, `translate`, `scale`, `fliplr`, `mosaic`, `mixup` — augmentation strengths.
 
 **Backprop trains the network's weights; the GA tunes these knobs above it** — a
-different optimizer for a different layer of the problem (next slide).
+different optimizer for a different layer of the problem.
 
 ---
 
-## The synergism — a GA tunes the network (какъв синергизъм)
+## The synergism — a GA tunes the network
 
 **The loop (one iteration = one generation):**
 
@@ -99,7 +94,7 @@ different optimizer for a different layer of the problem (next slide).
 
 ---
 
-## Why a GA — and not gradient descent? (защо ГА)
+## Why a GA — and not gradient descent?
 
 - Backprop trains the network's **weights** (~2.4 M) from the **gradient of the
   loss** — it runs inside every training step.
@@ -107,13 +102,14 @@ different optimizer for a different layer of the problem (next slide).
   training runs, and **validation mAP is non-differentiable** — it only exists
   *after* a full training run. You can't backprop through "train 10 epochs, then
   measure mAP."
-- So gradient descent **can't** tune these knobs; a **black-box evolutionary
-  search (the GA) can**. The two are **nested**: the GA's outer loop wraps
-  backprop's inner loop. *That coupling is the synergism.*
+- So gradient descent **can't** tune these knobs — but a **GA can**, by trial and
+  error: try a setting, train, measure mAP, keep what works.
+- The two are **nested**: the GA (outer loop) picks the settings; backprop (inner
+  loop) trains the network with them. *That coupling is the synergism.*
 
 ---
 
-## The synergism — settings & conditions (настройки, условия)
+## The synergism — settings & conditions
 
 | Setting | Smoke demo | Real run (on-device) | Larger run (GPU) |
 |--|--|--|--|
@@ -130,7 +126,7 @@ genetic algorithm (selection + BLX-α crossover + mutation).
 
 ---
 
-## Results — the GA converging (какви резултати)
+## Results — the GA converging
 
 ![w:620](reports/figures/ga_fitness_evolution.png)
 
@@ -138,14 +134,14 @@ genetic algorithm (selection + BLX-α crossover + mutation).
   ~77 min): best-so-far climbs **0.392 → 0.505** (peak at gen 16) →
   **mAP@.5 ≈ 0.78, mAP@.5:.95 ≈ 0.505** — a good single-class detector *found by
   evolution*, on the laptop, no GPU.
-- Winning genome **rebalanced the loss**: box ↓ 4.64, cls ↑ 0.70, dfl ↑ 1.74,
-  lower `lr0`, gentler mosaic → saved to `reports/best_hyperparameters.yaml`.
+- Winning genome **rebalanced the loss** (box ↓, cls ↑, dfl ↑) with a lower `lr0`
+  and gentler mosaic → saved to `reports/best_hyperparameters.yaml`.
 - The **coco8 smoke run** (8 gens, best 0.0308) proves the same loop in seconds —
   tiny by design (3 epochs on 8 images).
 
 ---
 
-## Results — what the search learned (какво означават)
+## Results — what the search learned
 
 ![w:760](reports/figures/tune_scatter_plots.png)
 
@@ -156,7 +152,7 @@ genetic algorithm (selection + BLX-α crossover + mutation).
 
 ---
 
-## Honesty note (for the defense)
+## Scope & honest limitations
 
 - The coco8 run is a **smoke demo**: 8 generations × 3 epochs on **8 images**.
 - It proves the **mechanism** — a working GA → network → fitness → selection
@@ -165,12 +161,16 @@ genetic algorithm (selection + BLX-α crossover + mutation).
 - For a **real, non-toy** trajectory I ran the same GA on the DL project's
   **traffic-cone** dataset (single class) — small enough to evolve **entirely on
   the M3 laptop**, and it reached **mAP@.5:.95 ≈ 0.505** (best of 20 generations).
+- Genomes are scored at a **fixed budget** (10 epochs/individual): the winner is
+  best *for that budget*, **not guaranteed optimal for a longer final run** —
+  short training favours fast-converging settings. The evolved genome is a strong
+  recipe to verify, not a proven global optimum.
 - The COCO-subset run (100 generations) is the *identical* command on a GPU.
   Same honesty discipline as the DL project's smoke runs.
 
 ---
 
-## Technological description (технологично описание)
+## Technological description
 
 - **Environment:** Python 3.13.7, managed with `uv`; VS Code.
 - **Library stack:** Ultralytics (YOLO26 + genetic tuner), PyTorch /
@@ -178,8 +178,7 @@ genetic algorithm (selection + BLX-α crossover + mutation).
   config, seed, and the class subset.
 - **Hardware:** a **MacBook Air M3** (10-core GPU, MPS) runs both the smoke demo
   and the real traffic-cone evolution on-device — the same laptop that fine-tuned
-  the cone detector in ~32 min. A CUDA GPU (AWS / Colab, ~\$20) is only for the
-  larger COCO-subset run.
+  the cone detector in ~32 min.
 
 ---
 
@@ -193,5 +192,3 @@ genetic algorithm (selection + BLX-α crossover + mutation).
 - End-to-end and reproducible from two `uv run` commands.
 - Built on top of my Deep Learning project — data, EDA, and YOLO network reused;
   the new, graded contribution is the **evolutionary hyperparameter search**.
-
-**Reproduce →** smoke: `--data coco8.yaml`; real on-device: `--data DATA/traffic_cone/traffic_cone.yaml --epochs 10 --iterations 20 --device mps`

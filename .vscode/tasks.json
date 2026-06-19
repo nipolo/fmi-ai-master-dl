@@ -49,6 +49,39 @@
         "reveal": "always",
         "panel": "shared"
       }
+    },
+    {
+      "label": "nnga:regen-presentation",
+      "type": "shell",
+      "command": "sudo npx -y @marp-team/marp-cli@latest _NNGA/PRESENTATION.md --pptx --allow-local-files",
+      "detail": "Render _NNGA/PRESENTATION.md to PRESENTATION.pptx (Marp)",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "nnga:run-ga",
+      "type": "shell",
+      "command": "uv run python _NNGA/src/evolve_hyperparameters.py --data DATA/traffic_cone/traffic_cone.yaml --epochs 10 --iterations 20 --device mps",
+      "detail": "Evolve YOLO hyperparameters with the GA (traffic-cone, on-device MPS)",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "nnga:plot-evolution",
+      "type": "shell",
+      "command": "uv run python _NNGA/src/plot_evolution.py",
+      "detail": "Regenerate the GA fitness-vs-generation figure from tune_results.ndjson",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
     }
   ]
 }
