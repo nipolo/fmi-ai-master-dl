@@ -86,8 +86,8 @@
     {
       "label": "nnga:zip",
       "type": "shell",
-      "command": "rm -f _NNGA.zip && zip -r NNGA.zip _NNGA -x '_NNGA/runs/*' '_NNGA/Documentation/*' '_NNGA/.venv/*' '*/__pycache__/*' '*.DS_Store'",
-      "detail": "Package _NNGA/ for submission (excludes runs, Documentation, .venv, caches)",
+      "command": "rm -rf .nnga_stage NNGA.zip && rsync -a --exclude runs --exclude Documentation --exclude .venv --exclude __pycache__ --exclude '.DS_Store' _NNGA/ .nnga_stage/NNGA/ && (cd .nnga_stage && zip -rq ../NNGA.zip NNGA) && rm -rf .nnga_stage",
+      "detail": "Package _NNGA/ as NNGA.zip (top folder 'NNGA', no underscore; excludes runs, Documentation, .venv, caches)",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
