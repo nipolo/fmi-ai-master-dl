@@ -53,8 +53,8 @@
     {
       "label": "nnga:regen-presentation",
       "type": "shell",
-      "command": "sudo marp _NNGA/PRESENTATION.BG.md --pptx --allow-local-files",
-      "detail": "Render _NNGA/PRESENTATION.BG.md to PRESENTATION.pptx (Marp)",
+      "command": "sudo marp _NNGA/PRESENTATION.md --pptx --allow-local-files",
+      "detail": "Render _NNGA/PRESENTATION.md to PRESENTATION.pptx (Marp)",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",

@@ -1,6 +1,6 @@
 ---
 marp: true
-title: Evolving an Object Detector with a Genetic Algorithm
+title: Еволюция на детектор на обекти с генетичен алгоритъм
 paginate: true
 style: |
   .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; }
@@ -8,121 +8,118 @@ style: |
   .cols ul { font-size: 0.92em; }
 ---
 
-# Evolving an Object Detector with a Genetic Algorithm
+# Еволюция на детектор на обекти с генетичен алгоритъм
 
-**Neural Networks & Genetic Algorithms — course work (variant *with synergism*)**
+**Невронни мрежи и генетични алгоритми — курсова работа (вариант *със синергизъм*)**
 
-A genetic algorithm tunes a YOLO object-detection network on COCO
+Генетичен алгоритъм настройва YOLO мрежа за разпознаване на обекти върху COCO
 
----
-
-## The task
-
-- **Object detection:** given an everyday image, find *what* objects are present
-  **and** *where* (bounding boxes).
-- The neural network is **YOLO26n** — the one-stage detector from my Deep
-  Learning project.
-- **The new goal here:** don't hand-pick the network's hyperparameters —
-  let a **genetic algorithm evolve them**, scored by the network's own accuracy.
-- That coupling is the **synergism** this course asks for.
+**Борислав Вълков** · специалност ИИ · ф.н. 4MI3400759
 
 ---
 
-## The data — what it looks like
+## Задачата
 
-- **COCO** — Common Objects in Context. 80 classes, everyday scenes — 🔗 <https://cocodataset.org>
-- **Traffic-cone** (real on-device run) — single class, not in COCO's 80 — 🔗 [dataset](https://github.com/krisstern/traffic-cone-image-dataset)
-- From my EDA of COCO val2017 (4 952 images, 36 781 boxes):
-  - **Severe imbalance** — person 11 004 vs toaster 9 (~1 200:1).
-  - **Cluttered** — 7.4 objects per image on average (up to 63).
-  - **Small-object-heavy** — 46.7 % of objects cover < 1 % of the image.
-
-![w:320](reports/figures/eda_class_distribution.png)
-
----
-
-## The data — transformations & conclusions
-
-**Transformations / preliminary analysis:**
-
-- Dropped **crowd** boxes and degenerate (≤1 px) boxes.
-- Images scaled to [0, 1]; standard YOLO augmentation (HSV, flip, mosaic…).
-
-**Conclusions:**
-
-- Because the data is **imbalanced and small-object-heavy**, hyperparameters
-  like **learning rate** and **augmentation strength** strongly affect accuracy.
-- They are worth **searching automatically**, not guessing — motivating the GA.
+- **Разпознаване на обекти:** при дадено ежедневно изображение да се намери *какви*
+  обекти присъстват **и** *къде* (ограничаващи правоъгълници).
+- Невронната мрежа е **YOLO26n** — едностъпковият детектор от проекта ми по
+  DL.
+- **Новата цел тук:** да не подбираме ръчно хиперпараметрите на мрежата —
+  а да оставим **генетичен алгоритъм да ги еволюира**, оценявани по точността на самата мрежа.
+- Това обвързване е **синергизмът**, който целим.
 
 ---
 
-## How I solve it — the network
+## Данните — как изглеждат
+
+- **COCO** — Common Objects in Context. 80 класа, сцени от ежедневието ни — 🔗 <https://cocodataset.org>
+- **Traffic-cone** (реално локално трениране) — един клас, който не е сред 80-те на COCO — 🔗 [набор данни](https://github.com/krisstern/traffic-cone-image-dataset)
+- От моя EDA на COCO val2017 (4 952 изображения, 36 781 правоъгълника):
+  - **Силен дисбаланс** — person 11 004 срещу toaster 9 (~1 200:1).
+  - **Претрупани сцени** — средно 7.4 обекта на изображение (до 63).
+  - **Преобладават малки обекти** — 46.7 % от обектите покриват < 1 % от изображението.
+
+---
+
+## Разпределение на класовете в COCO
+
+![w:1040](reports/figures/eda_class_distribution.png)
+
+---
+
+## Данните — трансформации и изводи
+
+**Трансформации / предварителен анализ:**
+
+- Премахнати **crowd** правоъгълници и изродени (≤1 px) правоъгълници.
+- Изображенията мащабирани до [0, 1]; стандартен YOLO augmentation (HSV, обръщане, mosaic…).
+
+**Изводи:**
+
+- Тъй като данните са **дисбалансирани и с преобладаващи малки обекти**, хиперпараметри
+  като **скоростта на обучение** и **силата на аугментацията** силно влияят на точността.
+- Затова си струва да се **търсят автоматично**, а не да се гадаят — което мотивира GA.
+
+---
+
+## Как решавам задачата — мрежата
 
 | | |
 |--|--|
-| Network | **YOLO26n** — one-stage, anchor-free; ~2.4 M params |
-| Optimizer | AdamW, COCO-pretrained init |
-| Evolved | ~20 hyperparameters = one **genome** (high-leverage genes below) |
+| Мрежа | **YOLO26n** — едностъпкова, anchor-free; ~2.4 млн. параметъра |
+| Оптимизатор | AdamW, инициализация с COCO предварително трениране |
+| Еволюирани | ~20 хиперпараметъра = един **геном** (ключови гени долу) |
 
-- `lr0` / `lrf` — learning-rate start & final-factor (the LR schedule).
-- `box` / `cls` / `dfl` — the three detection-loss weights; the GA's win came from **rebalancing these**.
-- `momentum`, `weight_decay`, `warmup_*` — optimizer dynamics.
-- `hsv_*`, `translate`, `scale`, `mosaic`, `mixup` — augmentation strengths.
+- `lr0` / `lrf` — начална и крайна скорост на обучение (графикът на LR).
+- `box` / `cls` / `dfl` — трите тегла на загубата; приносът на GA — от **пребалансирането им**.
+- `momentum`, `weight_decay`, `warmup_*` — динамика на оптимизатора.
+- `hsv_*`, `translate`, `scale`, `mosaic`, `mixup` — сили на аугментацията.
 
-**Backprop trains the weights; the GA tunes these knobs above it.**
-
----
-
-## The synergism — a GA tunes the network
-
-**The loop (one iteration = one generation):**
-
-1. **Selection** — fitness-proportional pick from the top-9 genomes so far.
-2. **Crossover** — blend the selected parents' genes (BLX-α).
-3. **Mutation** — Gaussian perturbation of ~50 % of genes, then clip to range.
-4. **Evaluation** — *train the YOLO network* with that genome, *measure mAP*.
-5. **Record & repeat** — keep the best-so-far genome.
-
-**Fitness = mAP@0.5:0.95**  (Ultralytics default weights `[0, 0, 0, 1]`)
-
-> The GA can't score a genome without running the network; the network's
-> hyperparameters come from the GA. **Neither works alone — that's the synergism.**
+**Backpropagation обучава теглата; GA настройва копчетата над него.**
 
 ---
 
-## Why a GA — and not gradient descent?
+## Синергизмът — GA настройва мрежата
 
-- Backprop trains the network's **weights** (~2.4 M) from the **gradient of the
-  loss** — it runs inside every training step.
-- But the **hyperparameters** (LR, loss weights, augmentation) govern *how* that
-  training runs, and **validation mAP is non-differentiable** — it only exists
-  *after* a full training run. You can't backprop through "train 10 epochs, then
-  measure mAP."
-- So gradient descent **can't** tune these knobs — but a **GA can**, by trial and
-  error: try a setting, train, measure mAP, keep what works.
-- The two are **nested**: the GA (outer loop) picks the settings; backprop (inner
-  loop) trains the network with them. *That coupling is the synergism.*
+**Цикълът (една итерация = едно поколение):**
+
+1. **Selection** — избор, пропорционален на Fitness-стойността, измежду най-добрите 9 генома досега.
+2. **Crossover** — смесване на гените на избраните родители (BLX-α).
+3. **Mutation** — Гаусово смущение на ~50 % от гените, след което отрязване до допустимия диапазон.
+4. **Evaluation** — *обучаваме YOLO мрежата* с този геном, *измерваме mAP*.
+5. **Record & repeat** — запазваме най-добрия геном досега.
+
+**Fitness = mAP@0.5:0.95**  (теглата по подразбиране на Ultralytics `[0, 0, 0, 1]`)
+
+> GA не може да оцени геном, без да пусне мрежата; хиперпараметрите на мрежата
+> идват от GA. **Нито едното не работи само — това е синергизмът.**
 
 ---
 
-## The synergism — settings & conditions
+## Защо GA — а не градиентно спускане?
 
-| Setting | Smoke demo | Real run (on-device) | Larger run (GPU) |
+- Обратното разпространение обучава **теглата** (~2.4 млн.) от градиента на загубата — във всяка стъпка.
+- Но **хиперпараметрите** управляват *как* протича обучението, а **валидационното mAP не е диференцируемо** — съществува едва *след* пълено трениране. Не можеш да се прави backpropagation и едновременно да се измери mAP.
+- Затова градиентното спускане **не може** да ги настрои — но **GA може**, чрез проба и грешка.
+- Двете са **вложени**: GA (външен цикъл) избира настройките; обратното разпространение (вътрешен) обучава мрежата с тях. *Това е синергизмът.*
+
+---
+
+## Синергизмът — настройки и условия
+
+| Настройка | Демо (smoke) | Реален (локално) | По-голям (GPU) |
 |--|--|--|--|
 | Generations | 8 | 20 | 100 |
 | Epochs / individual | 3 | 10 | 30 |
-| Dataset | coco8 (8 imgs) | traffic-cone (1 class) | COCO 10-class subset |
-| Mutation prob. | 0.5 | 0.5 | 0.5 |
-| Selection | weighted top-9 | weighted top-9 | weighted top-9 |
+| Dataset | coco8 | traffic-cone | COCO, 10 класа |
 | Device | Apple MPS | **Apple M3 (MPS)** | CUDA GPU |
 | Seed | 42 | 42 | 42 |
 
-Tool: Ultralytics' built-in evolutionary tuner (`YOLO.tune`) — a steady-state
-genetic algorithm (selection + BLX-α crossover + mutation).
+Инструмент: вграденият еволюционен tuner на Ultralytics (`YOLO.tune`) — стационарен генетичен алгоритъм (selection топ-9 по Fitness + BLX-α crossover + mutation 0.5).
 
 ---
 
-## Results — the GA converging
+## Резултати — GA е сходящ
 
 <div class="cols">
 <div>
@@ -132,16 +129,16 @@ genetic algorithm (selection + BLX-α crossover + mutation).
 </div>
 <div>
 
-- **Traffic-cone run** (20 gens × 10 epochs, Apple M3, ~77 min): best-so-far **0.392 → 0.505** (peak gen 16) → **mAP@.5 ≈ 0.78, mAP@.5:.95 ≈ 0.505** — on the laptop, no GPU.
-- Winning genome **rebalanced the loss** (box ↓, cls ↑, dfl ↑) → `best_hyperparameters.yaml`.
-- **coco8 smoke run**: same loop in seconds (best 0.0308).
+- **Трениране с traffic-cone** (20 поколения × 10 epochs, Apple M3, ~77 мин): най-доброто досега **0.392 → 0.505** (най-добро поколение 16) → **mAP@.5 ≈ 0.78, mAP@.5:.95 ≈ 0.505** — на лаптопа, без GPU.
+- Печелившият геном **пребалансира загубата** (box ↓, cls ↑, dfl ↑) → `best_hyperparameters.yaml`.
+- **smoke run с coco8**: същият цикъл за секунди (най-добро 0.0308).
 
 </div>
 </div>
 
 ---
 
-## Results — what the search learned
+## Резултати — какво научи търсенето
 
 <div class="cols">
 <div>
@@ -151,43 +148,44 @@ genetic algorithm (selection + BLX-α crossover + mutation).
 </div>
 <div>
 
-- Fitness vs each gene shows **which hyperparameters matter**.
-- The **loss-weight genes** (`box`, `cls`, `dfl`) and **learning rate** are the high-leverage ones — the GA's win came from rebalancing them.
-- The GA replaces manual trial-and-error with an **accuracy-driven search**.
+- Fitness спрямо всеки ген показва **кои хиперпараметри имат значение**.
+- **Гените на теглата на загубата** (`box`, `cls`, `dfl`) и **скоростта на обучение** са с най-голямо влияние — печалбата на GA дойде от пребалансирането им.
+- GA заменя ръчното проба-грешка с **търсене, водено от точността**.
 
 </div>
 </div>
 
 ---
 
-## Scope & honest limitations
+## Обхват и честни ограничения
 
-- The coco8 run is a **smoke demo** (8 gens × 3 epochs on **8 images**): it proves the **mechanism**, not a converged search — fitness stays near-zero by design.
-- The **real result** is the traffic-cone run (single class), evolved **entirely on the M3 laptop** to **mAP@.5:.95 ≈ 0.505** (best of 20 generations).
-- Genomes are scored at a **fixed budget** (10 epochs each): the winner is best *for that budget*, **not guaranteed optimal for a longer run** — a strong recipe to verify, not a proven optimum.
-- The COCO-subset run (100 generations) is the *identical* command on a GPU.
-
----
-
-## Technological description
-
-- **Environment:** Python 3.13.7, managed with `uv`; VS Code.
-- **Library stack:** Ultralytics (YOLO26 + genetic tuner), PyTorch /
-  torchvision, pycocotools, matplotlib. Reuses my `objdetect` package for
-  config, seed, and the class subset.
-- **Hardware:** a **MacBook Air M3** (10-core GPU, MPS) runs both the smoke demo
-  and the real traffic-cone evolution on-device — the same laptop that fine-tuned
-  the cone detector in ~32 min.
+- Smoke run на coco8 е **демо** (8 поколения × 3 епохи върху **8 изображения**): доказва **механизма**, а не сходило търсене — Fitness-ът остава близо до нула по замисъл.
+- **Реалният резултат** е run на traffic-cone (един клас), еволюиран **изцяло на лаптопа M3** до **mAP@.5:.95 ≈ 0.505** (най-добро от 20 поколения).
+- Геномите се оценяват при **фиксиран бюджет** (по 10 епохи): победителят е най-добър *за този бюджет*, **без гаранция за оптималност при по-дълъг run**.
+- Run върху подмножество на COCO (100 поколения) е *същата* команда на GPU.
 
 ---
 
-## Summary
+## Технологично описание
 
-- Coupled a **genetic algorithm** with an **object-detection network** into a
-  real synergism: **GA proposes hyperparameters → network scores them by mAP →
-  GA selects & mutates toward better ones.**
-- A **real on-device run** (traffic-cone, Apple M3) evolved the detector to
-  **mAP@.5:.95 ≈ 0.505** in 20 generations — no GPU needed.
-- End-to-end and reproducible from two `uv run` commands.
-- Built on top of my Deep Learning project — data, EDA, and YOLO network reused;
-  the new, graded contribution is the **evolutionary hyperparameter search**.
+- **Среда:** Python 3.13.7, управляван с `uv`; VS Code.
+- **Библиотеки:** Ultralytics (YOLO26 + генетичен настройчик), PyTorch /
+  torchvision, pycocotools, matplotlib. Преизползва пакета ми `objdetect` за
+  конфигурация, seed и подмножеството от класове.
+- **Хардуер:** **MacBook Air M3** (10-ядрено GPU, MPS) изпълнява локално и демото, и
+  реалната еволюция с traffic-cone — същият лаптоп, който дообучи детектора на конуси
+  за ~32 мин.
+
+---
+
+## Обобщение
+
+- Свързах **генетичен алгоритъм** с **мрежа за разпознаване на обекти** в реален
+  синергизъм: **GA предлага хиперпараметри → мрежата ги оценява по mAP →
+  GA селектира и мутира към по-добри.**
+- **Реален локален run** (traffic-cone, Apple M3) еволюира детектора до
+  **mAP@.5:.95 ≈ 0.505** за 20 поколения — без нужда от GPU.
+- Изпълним от край до край и възпроизводим с две `uv run` команди.
+- Изграден върху проекта ми по DL — данните, EDA и YOLO мрежата са
+  преизползвани; 
+- Приносът на GA - **еволюционното търсене на хиперпараметри**.
