@@ -1,6 +1,7 @@
 # GA × NN Synergism Report — Evolving a YOLO Detector's Hyperparameters
 
-**Course:** Neural Networks & Genetic Algorithms — variant *"със синергизъм"* (with synergism). **Author:** Borislav Valkov.
+**Course:** Neural Networks & Genetic Algorithms — variant with synergism. 
+**Author:** Borislav Valkov.
 
 A **genetic algorithm optimizes a YOLO detector's hyperparameters**, scored by the network's own validation mAP. The neural network, COCO data, and EDA are reused from the Deep Learning project (Topic 4); the new contribution is the evolutionary search.
 

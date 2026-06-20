@@ -23,9 +23,17 @@ _NNGA/
 
 ## Reproduce
 
-> **Derived project / standalone note.** This folder ships as part of the parent Deep Learning repo and the commands below are meant to be run from its root (where `uv` and the `objdetect` package are set up). The two scripts themselves are standalone — they need only `ultralytics`, `torch` and `matplotlib`, and `evolve_hyperparameters.py` falls back to seed 42 if `objdetect` is absent — but faithfully reproducing the **full** run (especially the traffic-cone dataset, laid out by the parent repo's `scripts/prepare_cone_dataset.py`) expects that parent environment. The committed results, figures and `best_hyperparameters.yaml` let the report and presentation stand on their own without rerunning anything.
+> **Derived project / standalone note.** This folder is **self-contained**: it ships its own `pyproject.toml` and `uv.lock` (deps: `ultralytics`, `torch`, `torchvision`, `matplotlib`), and `evolve_hyperparameters.py` falls back to seed 42 when the parent's `objdetect` package is absent. So the scripts run on their own — from *inside* `_NNGA/`:
+>
+> ```bash
+> uv sync                                                  # build the standalone env
+> uv run python src/evolve_hyperparameters.py --data coco8.yaml --epochs 3 --iterations 8
+> uv run python src/plot_evolution.py
+> ```
+>
+> The only thing that still needs the parent repo is the **traffic-cone dataset** (laid out by the parent's `scripts/prepare_cone_dataset.py`); the `coco8.yaml` smoke run auto-downloads and is fully standalone. The committed results, figures and `best_hyperparameters.yaml` let the report and presentation stand on their own without rerunning anything.
 
-From the repository root (the `objdetect` env is already set up — `uv sync` if not):
+The commands below assume the **parent repo** (run from its root, where `objdetect` is also available):
 
 ```bash
 # 1) Run the genetic algorithm (smoke demo — minutes on Apple Silicon / CPU):

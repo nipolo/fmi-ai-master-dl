@@ -1,0 +1,17 @@
+[project]
+name = "nnga-yolo-evolution"
+version = "0.1.0"
+description = "Evolving a YOLO detector's hyperparameters with a genetic algorithm — NN & Genetic Algorithms course (variant with synergism)"
+readme = "README.md"
+requires-python = ">=3.13"
+# Minimal runtime deps for the two scripts in src/:
+#   evolve_hyperparameters.py -> ultralytics (pulls torch/torchvision), torch
+#   plot_evolution.py         -> matplotlib
+# The `objdetect` import in evolve_hyperparameters.py is optional (falls back to
+# seed 42 when absent), so this folder runs standalone without the parent repo.
+dependencies = [
+    "ultralytics>=8.4.66",
+    "torch>=2.12,<2.13",
+    "torchvision>=0.27,<0.28",
+    "matplotlib>=3.9",
+]

@@ -53,8 +53,8 @@
     {
       "label": "nnga:regen-presentation",
       "type": "shell",
-      "command": "sudo marp _NNGA/PRESENTATION.md --pptx --allow-local-files",
-      "detail": "Render _NNGA/PRESENTATION.md to PRESENTATION.pptx (Marp)",
+      "command": "sudo marp _NNGA/PRESENTATION.BG.md --pptx --allow-local-files",
+      "detail": "Render _NNGA/PRESENTATION.BG.md to PRESENTATION.pptx (Marp)",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -77,6 +77,17 @@
       "type": "shell",
       "command": "uv run python _NNGA/src/plot_evolution.py",
       "detail": "Regenerate the GA fitness-vs-generation figure from tune_results.ndjson",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "nnga:zip",
+      "type": "shell",
+      "command": "rm -f _NNGA.zip && zip -r NNGA.zip _NNGA -x '_NNGA/runs/*' '_NNGA/Documentation/*' '_NNGA/.venv/*' '*/__pycache__/*' '*.DS_Store'",
+      "detail": "Package _NNGA/ for submission (excludes runs, Documentation, .venv, caches)",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
