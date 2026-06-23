@@ -30,8 +30,8 @@ presentable.
 - torchvision `fasterrcnn_resnet50_fpn` — first as pretrained baseline
   (evaluate mAP on our subset), then fine-tuned on the subset.
 - Training script with config files, fixed seeds, checkpointing.
-- Cloud: smoke-test locally on MPS, full fine-tune on an AWS EC2 GPU instance
-  (g5.xlarge spot, ~$0.50/h, a few hours total) — only if local proves too slow.
+- Runs entirely on the local Mac (M3, MPS); the subset is sized to fine-tune
+  on-device.
 - **Deliverable:** baseline + fine-tuned metrics in `reports/MODEL_REPORT.md`.
 
 ## Phase 4 — YOLO experiments (Req. 4)
@@ -69,7 +69,5 @@ presentable.
 1. **Exercise test style** — Req. 6 says tests "written the way shown in
    exercises". Share one exercise test file so the suite matches; BDD will be
    layered on top.
-2. **Cloud budget** — is AWS OK (est. $5–20 total), or prefer free tiers
-   (Kaggle/Colab GPUs)? Local Mac MPS may suffice for the small subset.
-3. **Language** — report and presentation in Bulgarian, English, or both?
-4. **Deadline** — to pace the phases.
+2. **Language** — report and presentation in Bulgarian, English, or both?
+3. **Deadline** — to pace the phases.

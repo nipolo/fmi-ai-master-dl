@@ -5,7 +5,7 @@ Usage:
   uv run python scripts/train.py --scheduler step   --epochs 6 --max-batches 20
 
 ``--max-batches`` caps batches per epoch for a quick local smoke run; omit it
-for a full run (intended for the cloud GPU).
+for a full run over the whole subset.
 """
 
 import argparse

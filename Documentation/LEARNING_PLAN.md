@@ -52,13 +52,7 @@ Suppression (NMS), anchors, mAP and how mAP@0.5 / mAP@0.5:0.95 are computed.
 - Self-check: add one trivial scenario (e.g. "app shows an error for a corrupt
   image") yourself, watch it fail, make it pass.
 
-## Module 7 — Cloud training (if used) (~2 h) → during Phases 3–4
-- Understand the workflow used: launching a GPU instance, syncing code,
-  running training in tmux, pulling checkpoints back, shutting the instance
-  down (cost control).
-- Self-check: explain why training needed a GPU and what the cloud run cost.
-
-## Module 8 — Presentation & defense prep (~3 h) → Phase 7
+## Module 7 — Presentation & defense prep (~3 h) → Phase 7
 - Rehearse the demo: launch app, detect on 2–3 prepared images, show the
   model comparison and LR-schedule plots.
 - Prepare answers to likely questions:

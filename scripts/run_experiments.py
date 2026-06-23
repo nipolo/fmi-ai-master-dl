@@ -6,8 +6,8 @@ For each LR schedule (cosine, step) this:
   3. evaluates mAP on the subset,
 and then writes a combined loss/LR comparison figure plus a metrics JSON.
 
-Defaults are sized for a quick CPU/MPS smoke run (small --max-batches). For the
-real run, raise --epochs and drop --max-batches on a CUDA GPU.
+Defaults are sized for a quick CPU/MPS smoke run (small --max-batches). For a
+heavier run, raise --epochs and drop --max-batches.
 
 Usage:
   uv run python scripts/run_experiments.py --epochs 6 --max-batches 15

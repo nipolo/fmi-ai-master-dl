@@ -39,9 +39,10 @@ adapted, and both adaptations are flagged where they occur:
   scores mAP ≈ 0, making every % change infinite and useless). The realistic
   baseline a client starts from is the **off-the-shelf COCO-pretrained
   Faster R-CNN**, so that is row 1 and all % changes are measured against it.
-- **Train-vs-validation diagrams (MRF rule 7).** The smoke runs log per-epoch
-  *training* loss and only end-of-run mAP, so a true per-epoch train-vs-val curve
-  is deferred to the full cloud run; see the honesty note in §6.
+- **Train-vs-validation diagrams (MRF rule 7).** These on-laptop demonstration
+  runs log per-epoch *training* loss and only end-of-run mAP, so a true per-epoch
+  train-vs-validation curve is out of scope; the schedule mechanism is shown via
+  the LR-vs-epoch and training-loss-vs-epoch curves instead. See the note in §6.
 
 ## 1. Dataset
 
@@ -49,7 +50,7 @@ adapted, and both adaptations are flagged where they occur:
   benchmark named in the assignment.
 - **Subset for fine-tuning** (`config.SUBSET_CLASSES`): person, bicycle, car,
   dog, cat, chair, bottle, cup, laptop, cell phone — ten common classes kept
-  small so experiments fit the time and cloud budget.
+  small so experiments fit the project's time budget and run on-device.
 - **Preprocessing:** crowd boxes and degenerate (≤1 px) boxes dropped; images
   scaled to float tensors in [0, 1]; horizontal-flip augmentation for training.
 - See `EDA_REPORT.md` for the full data analysis (Requirement 2).
@@ -122,10 +123,9 @@ epoch 3/3  lr=0.00126  loss=0.9344
 ```
 
 The smoke configuration (few epochs, capped batches) exists to prove the
-pipeline on a laptop. A full fine-tune (all subset images, ~10–15 epochs) is
-intended for a CUDA GPU instance (AWS g5.xlarge) and is launched with the same
-script minus `--max-batches`; see the LR-schedule experiment below, which uses
-this pipeline.
+pipeline on a laptop. A longer fine-tune (all subset images, ~10–15 epochs) uses
+the same script minus `--max-batches`; see the LR-schedule experiment below,
+which uses this pipeline.
 
 ## 6. Hypothesis table — LR-schedule experiment (Requirement 5)
 
@@ -171,12 +171,11 @@ model):
 > **Honesty note for the defense (MRF rule 7).** These are deliberately *small*
 > runs (≈100 training images per run, evaluated on ~50), so the absolute mAP
 > (~0.09) is far below the pretrained baseline in §4 — they exist to demonstrate
-> the schedule *mechanism* on a laptop, not to beat the baseline. The smoke runs
-> log per-epoch *training* loss and only end-of-run mAP, so the MRF's
-> *train-vs-validation* loss/metric curves are produced by the full cloud run
-> (all subset images, 10–15 epochs, identical command without `--max-batches`),
-> which records both splits per epoch. The LR-vs-epoch and training-loss-vs-epoch
-> curves above are shown in the interim.
+> the schedule *mechanism* on a laptop, not to beat the baseline. They log
+> per-epoch *training* loss and only end-of-run mAP, so a full
+> *train-vs-validation* per-epoch curve is out of scope here; the LR-vs-epoch and
+> training-loss-vs-epoch curves above are what the experiment reports, and they
+> are sufficient to show the difference between the two schedules.
 
 ## 7. Extension — fine-tuning a new class (traffic cone)
 

@@ -121,7 +121,7 @@ more false positives. The trade-off, made visible.
 
 ## What I'd do with more time / compute
 
-- Full fine-tune on a **cloud GPU** (AWS g5) over all subset images, more epochs.
+- Longer fine-tune over all subset images, more epochs.
 - Add a larger YOLO (v8m) and a RetinaNet for a three-way curve.
 - Per-class mAP breakdown to see where each model wins.
 

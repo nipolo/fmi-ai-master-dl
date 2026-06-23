@@ -33,8 +33,8 @@ Additional success criteria (user's own):
 - Streamlit for the UI.
 - `pytest` + `pytest-bdd` for BDD tests.
 - matplotlib / seaborn for EDA visualizations.
-- Training: local Apple Silicon (MPS) for smoke runs; AWS EC2 GPU (or similar
-  cloud) for real fine-tuning runs on COCO subsets.
+- Training: local Apple Silicon (MPS); COCO subsets are sized to fine-tune
+  on-device, no cloud GPU required.
 
 ## Project layout
 
@@ -63,7 +63,6 @@ Documentation/        # requirements PDF, project & learning plans
   `# Arrange / # Act / # Assert / # Clean` comment sections and
   `expected_*` / `actual_*` variable naming. BDD tests (Gherkin + `pytest-bdd`)
   live alongside in `tests/features/` + `tests/steps/`.
-- Cloud budget approved: up to ~$20 on AWS if local MPS training is too slow.
 - Deadline: presentation ~2026-06-20; code must be complete by ~2026-06-15 so
   the user has 5 days to study it.
 - Every model experiment gets logged into `reports/MODEL_REPORT.md` (config,

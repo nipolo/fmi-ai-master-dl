@@ -57,6 +57,6 @@ and walk through it instead.
   smooth, step is a staircase — show the curves, state which gave lower loss.
 - *Walk me through a click of "Detect".* `main.py` → `inference.run_detection`
   → `model.predict` → `visualization.draw_detections` → table + counts.
-- *What would you improve with more compute?* Full cloud fine-tune, bigger YOLO,
-  per-class mAP.
+- *What would you improve with more compute?* More epochs on a larger subset, a
+  bigger YOLO variant, per-class mAP.
 ```
