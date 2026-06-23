@@ -10,10 +10,10 @@
       "justMyCode": false
     },
     {
-      "name": "Debug script: train.py (cosine)",
+      "name": "Debug script: objdetect.cli.train (cosine)",
       "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/scripts/train.py",
+      "module": "objdetect.cli.train",
       "args": ["--scheduler", "cosine", "--epochs", "6"],
       "console": "integratedTerminal",
       "justMyCode": false
@@ -23,7 +23,7 @@
       "type": "debugpy",
       "request": "launch",
       "module": "streamlit",
-      "args": ["run", "src/objdetect/app/main.py"],
+      "args": ["run", "objdetect/app/main.py"],
       "console": "integratedTerminal",
       "justMyCode": false
     }

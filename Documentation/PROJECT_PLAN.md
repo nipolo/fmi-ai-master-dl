@@ -6,12 +6,12 @@ presentable.
 
 ## Phase 0 — Scaffolding
 - `uv`-managed Python 3.13.7 project, `pyproject.toml`, package skeleton
-  `src/objdetect/`, `tests/`, `reports/`, `.gitignore` for datasets/weights.
+  `objdetect/`, `tests/`, `reports/`, `.gitignore` for datasets/weights.
 - CI-style local check: `uv run pytest` green from day one.
 - **Deliverable:** runnable empty project, first git commits.
 
 ## Phase 1 — Literature review (Req. 1)
-- Short written survey in `reports/LITERATURE_REVIEW.md`: two-stage detectors
+- Short written survey in `research/LITERATURE_REVIEW.md`: two-stage detectors
   (R-CNN → Fast R-CNN → Faster R-CNN), one-stage detectors (YOLO v1 → v8/v11,
   SSD), key concepts (IoU, anchors, NMS, mAP), and the COCO benchmark.
 - **Deliverable:** 3–5 page survey with citations, reused later in the presentation.
@@ -20,7 +20,7 @@ presentable.
 - Download COCO 2017 `val` split (~1 GB, 5k images) + annotations; define a
   fixed training subset (e.g. 10–20 everyday-context classes) so experiments
   stay affordable.
-- EDA notebook + `reports/EDA_REPORT.md`: image counts, class distribution and
+- EDA notebook + `research/EDA_REPORT.md`: image counts, class distribution and
   imbalance, boxes-per-image, box size/aspect-ratio distributions, co-occurrence
   of classes (statistical dependencies), anomalies (crowd boxes, tiny/degenerate
   boxes, mislabeled samples), all with plots and written commentary.

@@ -6,7 +6,7 @@ the analysis functions can be checked without downloading the dataset.
 
 import unittest
 
-from objdetect.data import eda
+from objdetect import eda
 
 
 class _FakeCoco:

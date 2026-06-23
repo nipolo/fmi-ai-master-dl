@@ -39,7 +39,7 @@ Suppression (NMS), anchors, mAP and how mAP@0.5 / mAP@0.5:0.95 are computed.
 ## Module 5 — PyTorch & the codebase (~6 h) → after Phases 3–5 are coded
 - PyTorch basics: tensors, `Dataset`/`DataLoader`, a training loop's anatomy
   (forward, loss, backward, optimizer step).
-- Code walkthrough: read `src/objdetect/` top-down — data → models → training →
+- Code walkthrough: read `objdetect/` top-down — data → models → training →
   evaluation. For each file, write a one-line summary of what it does.
 - Run everything yourself: download data, run a short training, run evaluation.
 - Self-check: modify one hyperparameter (e.g. batch size) and rerun a smoke

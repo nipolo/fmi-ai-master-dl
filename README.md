@@ -6,12 +6,12 @@ A web application that detects objects in everyday photos, backed by experiments
 
 ## Requirements coverage
 
-1. Literature review → `reports/LITERATURE_REVIEW.md`
-2. COCO data exploration → `reports/EDA_REPORT.md`, `notebooks/01_eda.ipynb`
-3. Faster R-CNN experiments → `src/objdetect/models/faster_rcnn.py`, benchmarks
-4. YOLO experiments → `src/objdetect/models/yolo.py`, benchmarks
-5. LR schedules (cosine annealing + step decay) → `src/objdetect/training/schedulers.py`
-6. Streamlit UI + tests → `src/objdetect/app/`, `tests/`
+1. Literature review → `research/LITERATURE_REVIEW.md`
+2. COCO data exploration → `research/EDA_REPORT.md`, `research/01_eda.ipynb`
+3. Faster R-CNN experiments → `objdetect/models/faster_rcnn.py`, benchmarks
+4. YOLO experiments → `objdetect/models/yolo.py`, benchmarks
+5. LR schedules (cosine annealing + step decay) → `objdetect/training/schedulers.py`
+6. Streamlit UI + tests → `objdetect/app/`, `tests/`
 7. Presentation → `reports/PRESENTATION.md`
 
 - BDD → `tests/features/`, `tests/steps/`
@@ -21,11 +21,11 @@ A web application that detects objects in everyday photos, backed by experiments
 
 | Path                     | What it is                                                             |
 | ------------------------ | ---------------------------------------------------------------------- |
-| `src/objdetect/`         | the package: `data`, `models`, `training`, `evaluation`, `app`         |
-| `scripts/`               | one-command entry points (download, EDA, train, evaluate, benchmark)   |
-| `notebooks/01_eda.ipynb` | interactive data exploration                                           |
+| `objdetect/`                   | the package: `data`, `eda`, `models`, `training`, `evaluation`, `app`, `cli` (+ `config.py`) |
+| `objdetect/cli/`               | one-command entry points, run via `python -m objdetect.cli.<name>` (download, train, evaluate, benchmark) |
+| `research/`              | Req. 1–2: literature review, EDA report + `01_eda.ipynb`, figures      |
 | `tests/`                 | `unittest` + `pytest-bdd` BDD tests                     |
-| `reports/`               | literature review, EDA report, **model report**, presentation, figures |
+| `reports/`               | **model report**, presentation, experiment results + figures          |
 | `Documentation/`         | requirements PDF                      |
 
 ## Setup
@@ -55,18 +55,18 @@ Select the `.venv` interpreter as the Jupyter kernel.
 
 ```bash
 # Data
-uv run python scripts/download_data.py        # fetch COCO val2017 (~780 MB)
-uv run python scripts/run_eda.py              # EDA figures + summary
+uv run python -m objdetect.cli.download_data        # fetch COCO val2017 (~780 MB)
+uv run python -m objdetect.eda.report    # EDA figures + summary
 
 # Models / experiments
-uv run python scripts/benchmark_baselines.py --max-images 200   # mAP/FPS/size
-uv run python scripts/train.py --scheduler cosine --epochs 6    # fine-tune
-uv run python scripts/run_experiments.py                        # cosine vs step
-uv run python scripts/plot_lr_schedules.py                      # LR curves figure
-uv run python scripts/compare_models_visual.py                  # side-by-side image
+uv run python -m objdetect.cli.benchmark_baselines --max-images 200   # mAP/FPS/size
+uv run python -m objdetect.cli.train --scheduler cosine --epochs 6    # fine-tune
+uv run python -m objdetect.cli.run_experiments                        # cosine vs step
+uv run python -m objdetect.cli.plot_lr_schedules                      # LR curves figure
+uv run python -m objdetect.cli.compare_models_visual                  # side-by-side image
 
 # App
-uv run streamlit run src/objdetect/app/main.py
+uv run streamlit run objdetect/app/main.py
 ```
 
 On first run each model downloads its pretrained weights automatically (YOLO via ultralytics, Faster R-CNN via torchvision) — needs internet once; cached afterwards. Only the data and EDA/training/benchmark commands need the COCO dataset (`download_data.py`); the app runs on uploaded photos without it.
@@ -89,5 +89,5 @@ Pre-configured tasks and debug profiles live in `.vscode/`.
 | Configuration                   | What it debugs                        |
 | ------------------------------- | ------------------------------------- |
 | Debug current Python file       | the file open in the editor           |
-| Debug script: train.py (cosine) | `scripts/train.py` with example args  |
+| Debug script: objdetect.cli.train (cosine) | `objdetect.cli.train` with example args  |
 | Debug Streamlit app             | the Streamlit app, breakpoints active |

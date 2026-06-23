@@ -38,19 +38,29 @@ Additional success criteria (user's own):
 
 ## Project layout
 
+Flat layout: the importable `objdetect` package lives at the repo root (no
+`src/` wrapper). Run command-line modules with `python -m objdetect.cli.<name>`.
+
 ```
-src/objdetect/        # importable package
-  data/               # COCO download, dataset wrappers, EDA utilities
-  models/             # faster_rcnn.py, yolo.py wrappers
+objdetect/            # the importable package (lives at repo root, not under src/)
+  config.py           # central paths, class subset, seeds
+  utils.py            # device / seed helpers
+  visualization.py    # draw detections on images
+  data/               # COCO download + dataset wrappers (coco.py)
+  eda/                # COCO exploratory analysis (analysis.py) + report.py
+  models/             # faster_rcnn.py, yolo.py, ensemble.py behind one interface
   training/           # train loop, LR schedulers (cosine annealing, step decay)
   evaluation/         # mAP / COCO metrics
   app/                # Streamlit application
-notebooks/            # EDA and experiment notebooks
+  cli/                # entry points, run via `python -m objdetect.cli.<name>`:
+                      #   download_data, prepare_cone_dataset, train,
+                      #   run_experiments, evaluate, benchmark_baselines,
+                      #   plot_lr_schedules, compare_models_visual
+research/             # Req. 1-2: LITERATURE_REVIEW.md, EDA_REPORT.md, 01_eda.ipynb, figures/
 tests/
   features/           # Gherkin .feature files (BDD)
   steps/              # step definitions
-reports/              # MODEL_REPORT.md, EDA report, training curves
-scripts/              # train / evaluate / download entry points
+reports/              # MODEL_REPORT.md, presentation, experiment results & training curves
 Documentation/        # requirements PDF, project & learning plans
 ```
 
@@ -80,5 +90,5 @@ Documentation/        # requirements PDF, project & learning plans
 
 - `uv sync` — install environment.
 - `uv run pytest` — run all tests (BDD + unit).
-- `uv run streamlit run src/objdetect/app/main.py` — launch the app.
-- `uv run python scripts/train.py --model faster_rcnn|yolo --scheduler cosine|step` — training entry point.
+- `uv run streamlit run objdetect/app/main.py` — launch the app.
+- `uv run python -m objdetect.cli.train --model faster_rcnn|yolo --scheduler cosine|step` — training entry point.

@@ -134,4 +134,4 @@ more false positives. The trade-off, made visible.
 - Demonstrated **LR scheduling**, **BDD tests**, and a **model report**.
 - Everything reproducible with a handful of `uv run` commands.
 
-**Demo time →** `uv run streamlit run src/objdetect/app/main.py`
+**Demo time →** `uv run streamlit run objdetect/app/main.py`

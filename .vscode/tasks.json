@@ -15,7 +15,7 @@
     {
       "label": "run:app",
       "type": "shell",
-      "command": "uv run streamlit run src/objdetect/app/main.py",
+      "command": "uv run streamlit run objdetect/app/main.py",
       "detail": "Launch the object-detection web app",
       "isBackground": true,
       "problemMatcher": [],
@@ -27,7 +27,7 @@
     {
       "label": "run:eda",
       "type": "shell",
-      "command": "uv run python scripts/run_eda.py",
+      "command": "uv run python -m objdetect.eda.report",
       "detail": "Generate EDA figures + summary from COCO data",
       "problemMatcher": [],
       "presentation": {

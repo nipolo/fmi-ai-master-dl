@@ -7,14 +7,14 @@ presentable.
 
 > How to regenerate everything in this report:
 > ```bash
-> uv run python scripts/download_data.py            # COCO val2017
-> uv run python scripts/run_eda.py                  # EDA figures + summary
-> uv run python scripts/plot_lr_schedules.py        # LR schedule figure
-> uv run python scripts/benchmark_baselines.py      # baseline comparison table (§4)
-> uv run python scripts/run_experiments.py          # fine-tune + LR comparison (§6)
+> uv run python -m objdetect.cli.download_data            # COCO val2017
+> uv run python -m objdetect.eda.report        # EDA figures + summary
+> uv run python -m objdetect.cli.plot_lr_schedules        # LR schedule figure
+> uv run python -m objdetect.cli.benchmark_baselines      # baseline comparison table (§4)
+> uv run python -m objdetect.cli.run_experiments          # fine-tune + LR comparison (§6)
 > # Extension — custom traffic-cone class (§7):
 > git clone --depth 1 https://github.com/krisstern/traffic-cone-image-dataset.git DATA/_cone_src
-> uv run python scripts/prepare_cone_dataset.py      # seeded 80/20 split + data yaml
+> uv run python -m objdetect.cli.prepare_cone_dataset      # seeded 80/20 split + data yaml
  # absolute project path -> run lands in DATA/runs/ (a relative path nests under
 > # Ultralytics' default runs/detect/, so pass it absolute); run from repo root:
 > uv run yolo detect train model=yolo26n.pt data=DATA/traffic_cone/traffic_cone.yaml \
@@ -53,7 +53,7 @@ adapted, and both adaptations are flagged where they occur:
   small so experiments fit the project's time budget and run on-device.
 - **Preprocessing:** crowd boxes and degenerate (≤1 px) boxes dropped; images
   scaled to float tensors in [0, 1]; horizontal-flip augmentation for training.
-- See `EDA_REPORT.md` for the full data analysis (Requirement 2).
+- See `research/EDA_REPORT.md` for the full data analysis (Requirement 2).
 
 ## 2. Models compared
 
@@ -78,7 +78,7 @@ Parameter count is treated as a fixed *model attribute* (above), not one of the
 
 ## 4. Hypothesis table — pretrained baselines (Requirements 3–4)
 
-Measured by `scripts/benchmark_baselines.py` on 200 subset images (CPU/MPS),
+Measured by `objdetect.cli.benchmark_baselines` on 200 subset images (CPU/MPS),
 through the shared `evaluate_coco_map` so both models go through one fair
 evaluation path. Rows are in creation order; **row 1 (Faster R-CNN) is the
 baseline**, and each metric shows its value with **% change vs that baseline**.
@@ -112,7 +112,7 @@ depends on whether you are bounded by accuracy/recall or by latency/size.*
 
 ## 5. Fine-tuning pipeline
 
-The fine-tuning pipeline (`scripts/train.py`, `scripts/run_experiments.py`) was
+The fine-tuning pipeline (`objdetect.cli.train`, `objdetect.cli.run_experiments`) was
 validated end-to-end on the subset: training loss decreases and checkpoints and
 history are saved. Example smoke run (Faster R-CNN, cosine schedule, CPU):
 
@@ -130,12 +130,12 @@ which uses this pipeline.
 ## 6. Hypothesis table — LR-schedule experiment (Requirement 5)
 
 Two Faster R-CNN fine-tuning runs, **identical except for the LR schedule**
-(same seed, epochs, base LR, data), produced by `scripts/run_experiments.py`.
+(same seed, epochs, base LR, data), produced by `objdetect.cli.run_experiments`.
 This is a self-contained sub-experiment with its own consistent eval slice
 (~50 images), so % change is measured **within the experiment, vs the
 cosine run (row 1, created first)**.
 
-**The schedules themselves** (`scripts/plot_lr_schedules.py`):
+**The schedules themselves** (`objdetect.cli.plot_lr_schedules`):
 
 ![LR schedules](figures/lr_schedules.png)
 
@@ -185,7 +185,7 @@ for the app without retraining on COCO.
 
 - **Dataset:** [krisstern/traffic-cone-image-dataset](https://github.com/krisstern/traffic-cone-image-dataset)
   — 263 images, single class `traffic cone`, YOLO-format labels, no known
-  copyright. Laid out by `scripts/prepare_cone_dataset.py` into a reproducible,
+  copyright. Laid out by `objdetect.cli.prepare_cone_dataset` into a reproducible,
   seeded (SEED=42) **80/20 split: 210 train / 53 val**.
 - **Config:** fine-tune from `yolo26n.pt`, 100 epochs, imgsz 640, batch 16,
   optimizer `auto` (AdamW, lr≈0.002), `patience=30`, `device=mps`.
