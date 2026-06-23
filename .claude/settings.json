@@ -41,7 +41,10 @@
       "Read(//tmp/**)",
       "Bash(rm -f /tmp/marp_out/*.png)",
       "Bash(marp PRESENTATION.md --images png --allow-local-files -o /tmp/marp_out/slide.png)",
-      "Bash(marp PRESENTATION.md --pptx --allow-local-files -o PRESENTATION.pptx)"
+      "Bash(marp PRESENTATION.md --pptx --allow-local-files -o PRESENTATION.pptx)",
+      "Bash(cp -p yolo26n.pt DATA/weights/yolo26n.pt)",
+      "Bash(cp -p DATA/checkpoints/cone_yolo26n.pt DATA/weights/cone_yolo26n.pt)",
+      "Bash(echo \"exit: $?\")"
     ]
   }
 }

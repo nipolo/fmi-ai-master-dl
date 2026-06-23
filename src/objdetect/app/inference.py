@@ -7,9 +7,10 @@ from objdetect import config
 from objdetect.models import build_detector
 from objdetect.models.base import Detection, Detector
 
-# Fine-tuned single-class cone weights (see scripts/prepare_cone_dataset.py and
-# the cone fine-tune); a path so YOLO loads the checkpoint rather than a hub name.
-CONE_WEIGHTS = str(config.CHECKPOINTS_DIR / "cone_yolo26n.pt")
+# Committed model weights (see config.WEIGHTS_DIR / DATA/weights/): the stock
+# YOLO26n base and the fine-tuned single-class cone checkpoint. Both are paths so
+# YOLO loads the files directly rather than downloading by hub name.
+CONE_WEIGHTS = config.CONE_WEIGHTS
 
 # Friendly label -> (builder name, kwargs) for the models the app offers.
 # The cone model adds a class absent from COCO's 80; on its own it detects only
@@ -17,13 +18,13 @@ CONE_WEIGHTS = str(config.CHECKPOINTS_DIR / "cone_yolo26n.pt")
 # alongside stock YOLO26n to cover all 81 classes (80 COCO + traffic cone).
 AVAILABLE_MODELS = {
     "Faster R-CNN (two-stage)": ("faster_rcnn", {}),
-    "YOLO26n (one-stage)": ("yolo", {"weights": "yolo26n.pt"}),
+    "YOLO26n (one-stage)": ("yolo", {"weights": config.YOLO_BASE_WEIGHTS}),
     "YOLO26n + Cones (81 classes)": (
         "ensemble",
         {
             "name": "YOLO26n + Cones",
             "members": [
-                ("yolo", {"weights": "yolo26n.pt"}),
+                ("yolo", {"weights": config.YOLO_BASE_WEIGHTS}),
                 ("yolo", {"weights": CONE_WEIGHTS}),
             ],
         },

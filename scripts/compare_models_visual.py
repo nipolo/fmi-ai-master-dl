@@ -31,7 +31,7 @@ def main() -> int:
     image = ImageOps.exif_transpose(Image.open(args.image)).convert("RGB")
 
     frcnn = build_detector("faster_rcnn")
-    yolo = build_detector("yolo", weights="yolo26n.pt")
+    yolo = build_detector("yolo", weights=config.YOLO_BASE_WEIGHTS)
 
     frcnn_dets = frcnn.predict(image, score_threshold=args.threshold)
     yolo_dets = yolo.predict(image, score_threshold=args.threshold)

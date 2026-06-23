@@ -20,8 +20,8 @@ presentable.
 > uv run yolo detect train model=yolo26n.pt data=DATA/traffic_cone/traffic_cone.yaml \
 >   epochs=100 imgsz=640 batch=16 device=mps cache=disk patience=30 \
 >   project="$PWD/DATA/runs" name=cone_yolo26n
-> # publish best weights to the path the app loads (config.CHECKPOINTS_DIR):
-> cp DATA/runs/cone_yolo26n/weights/best.pt DATA/checkpoints/cone_yolo26n.pt
+> # publish best weights to the path the app loads (config.WEIGHTS_DIR, committed):
+> cp DATA/runs/cone_yolo26n/weights/best.pt DATA/weights/cone_yolo26n.pt
 > ```
 
 ## How this report follows the Model-Report-File (MRF) guidelines

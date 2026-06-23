@@ -22,6 +22,10 @@ CHECKPOINTS_DIR = DATA_DIR / "checkpoints"
 REPORTS_DIR = ROOT_DIR / "reports"
 FIGURES_DIR = REPORTS_DIR / "figures"
 
+WEIGHTS_DIR = DATA_DIR / "weights"
+YOLO_BASE_WEIGHTS = str(WEIGHTS_DIR / "yolo26n.pt")
+CONE_WEIGHTS = str(WEIGHTS_DIR / "cone_yolo26n.pt")
+
 # --- COCO download sources ---------------------------------------------------
 
 COCO_VAL_IMAGES_URL = "http://images.cocodataset.org/zips/val2017.zip"

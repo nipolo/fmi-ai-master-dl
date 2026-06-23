@@ -195,11 +195,15 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,python
 ### Project-specific ###
 # Datasets and model weights (too large for git)
-DATA/
+DATA/*
 *.pt
 *.pth
 *.onnx
 runs/
 checkpoints/
+# Exception: the small (~5 MB each) model weights the app/ensemble loads at
+# runtime are committed so the demo runs without re-downloading or re-training.
+!DATA/weights/
+!DATA/weights/*.pt
 # macOS
 .DS_Store
