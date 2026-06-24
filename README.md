@@ -71,6 +71,8 @@ uv run streamlit run objdetect/app/main.py
 
 On first run each model downloads its pretrained weights automatically (YOLO via ultralytics, Faster R-CNN via torchvision) — needs internet once; cached afterwards. Only the data and EDA/training/benchmark commands need the COCO dataset (`download_data.py`); the app runs on uploaded photos without it.
 
+The **Faster R-CNN + Cones** app option needs the fine-tuned cone weights (~165 MB, not committed). Either train them (`uv run python -m objdetect.cli.train_cone_frcnn --device cpu --epochs 20`) or [download `faster_rcnn_cone.pth`](https://drive.google.com/file/d/1DKT2E__iErPYJHZxSdWXMG_TYYIIJO9c/view) into `DATA/weights/`.
+
 ## VS Code
 
 Pre-configured tasks and debug profiles live in `.vscode/`.

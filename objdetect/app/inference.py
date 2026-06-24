@@ -1,5 +1,7 @@
 """App-facing inference helpers, kept free of any Streamlit imports."""
 
+import os
+
 import pandas as pd
 from PIL.Image import Image
 
@@ -7,17 +9,30 @@ from objdetect import config
 from objdetect.models import build_detector
 from objdetect.models.base import Detection, Detector
 
-# Committed model weights (see config.WEIGHTS_DIR / DATA/weights/): the stock
-# YOLO26n base and the fine-tuned single-class cone checkpoint. Both are paths so
-# YOLO loads the files directly rather than downloading by hub name.
 CONE_WEIGHTS = config.CONE_WEIGHTS
+CONE_FRCNN_WEIGHTS = config.CONE_FRCNN_WEIGHTS
 
-# Friendly label -> (builder name, kwargs) for the models the app offers.
-# The cone model adds a class absent from COCO's 80; on its own it detects only
-# that class, so it is exposed only via the combined entry, which runs it
-# alongside stock YOLO26n to cover all 81 classes (80 COCO + traffic cone).
+# Friendly label -> (builder, kwargs). The cone model only detects its one class,
+# so it ships only via the combined "+ Cones" entries (one per detector family).
 AVAILABLE_MODELS = {
     "Faster R-CNN (two-stage)": ("faster_rcnn", {}),
+    "Faster R-CNN + Cones (81 classes)": (
+        "ensemble",
+        {
+            "name": "Faster R-CNN + Cones",
+            "members": [
+                ("faster_rcnn", {}),
+                (
+                    "faster_rcnn",
+                    {
+                        "num_classes": 1,
+                        "weights_path": CONE_FRCNN_WEIGHTS,
+                        "class_names": ["traffic cone"],
+                    },
+                ),
+            ],
+        },
+    ),
     "YOLO26n (one-stage)": ("yolo", {"weights": config.YOLO_BASE_WEIGHTS}),
     "YOLO26n + Cones (81 classes)": (
         "ensemble",
@@ -32,11 +47,34 @@ AVAILABLE_MODELS = {
 }
 
 
+def _missing_weights(builder_name: str, kwargs: dict) -> str | None:
+    """First referenced weights file that is absent (recursing into ensembles), else None."""
+    if builder_name == "ensemble":
+        for member_name, member_kwargs in kwargs.get("members", []):
+            missing = _missing_weights(member_name, member_kwargs)
+            if missing:
+                return missing
+        return None
+    path = kwargs.get("weights_path") or kwargs.get("weights")
+    if path and not os.path.exists(path):
+        return path
+    return None
+
+
 def load_model(display_name: str) -> Detector:
     """Instantiate the detector chosen in the UI dropdown."""
     if display_name not in AVAILABLE_MODELS:
         raise ValueError(f"unknown model '{display_name}'")
     builder_name, kwargs = AVAILABLE_MODELS[display_name]
+    missing = _missing_weights(builder_name, kwargs)
+    if missing:
+        raise FileNotFoundError(
+            f"Model weights not found: {missing}\n"
+            "The cone Faster R-CNN weights (~165 MB) are not committed. Either\n"
+            f"download them to {missing} from\n"
+            "https://drive.google.com/file/d/1DKT2E__iErPYJHZxSdWXMG_TYYIIJO9c/view\n"
+            "or train them: uv run python -m objdetect.cli.train_cone_frcnn --device cpu --epochs 20"
+        )
     return build_detector(builder_name, **kwargs)
 
 

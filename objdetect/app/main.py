@@ -74,7 +74,11 @@ def main() -> None:
 
     # --- Run the selected detector on the uploaded image ---
     image = ImageOps.exif_transpose(Image.open(uploaded)).convert("RGB")
-    model = _get_model(model_name)
+    try:
+        model = _get_model(model_name)
+    except FileNotFoundError as exc:
+        st.error(str(exc))
+        st.stop()
 
     with st.spinner("Running detection…"):
         detections = run_detection(model, image, score_threshold=score_threshold)

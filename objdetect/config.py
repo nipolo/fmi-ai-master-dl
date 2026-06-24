@@ -33,6 +33,13 @@ EDA_SUMMARY_FILE = RESEARCH_DIR / "eda_summary.json"
 WEIGHTS_DIR = DATA_DIR / "weights"
 YOLO_BASE_WEIGHTS = str(WEIGHTS_DIR / "yolo26n.pt")
 CONE_WEIGHTS = str(WEIGHTS_DIR / "cone_yolo26n.pt")
+CONE_FRCNN_WEIGHTS = str(WEIGHTS_DIR / "faster_rcnn_cone.pth")
+
+TRAFFIC_CONE_DIR = DATA_DIR / "traffic_cone"
+CONE_CLASS_NAMES = ["traffic cone"]
+CONE_COCO_TRAIN = TRAFFIC_CONE_DIR / "annotations" / "instances_train.json"
+CONE_COCO_VAL = TRAFFIC_CONE_DIR / "annotations" / "instances_val.json"
+CONE_YAML = TRAFFIC_CONE_DIR / "traffic_cone.yaml"
 
 # --- COCO download sources ---------------------------------------------------
 

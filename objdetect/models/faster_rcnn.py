@@ -34,6 +34,7 @@ class FasterRCNNDetector:
         num_classes: int | None = None,
         device: str | torch.device | None = None,
         weights_path: str | None = None,
+        class_names: list[str] | None = None,
     ) -> None:
         self.device = resolve_device(device)
 
@@ -61,6 +62,9 @@ class FasterRCNNDetector:
             self.model.load_state_dict(
                 torch.load(weights_path, map_location=self.device)
             )
+
+        if class_names is not None:
+            self.set_class_names(class_names)
 
         self.model.to(self.device)
         self.model.eval()
