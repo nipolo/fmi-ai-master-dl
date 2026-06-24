@@ -1,59 +1,9 @@
 # Model Report — Object Detection on COCO
 
-This is the project's **model report file** (a stated success criterion). It
-records every experiment as a hypothesis: the dataset slice, the configuration,
-the metrics, and the conclusions, so the results are reproducible and
-presentable.
+## 1. Data
 
-> How to regenerate everything in this report:
-> ```bash
-> uv run python -m objdetect.cli.download_data            # COCO val2017
-> uv run python -m objdetect.eda.report        # EDA figures + summary
-> uv run python -m objdetect.cli.plot_lr_schedules        # LR schedule figure
-> uv run python -m objdetect.cli.benchmark_baselines      # baseline comparison table (§4)
-> uv run python -m objdetect.cli.run_experiments          # fine-tune + LR comparison (§6)
-> # Extension — custom traffic-cone class (§7):
-> git clone --depth 1 https://github.com/krisstern/traffic-cone-image-dataset.git DATA/_cone_src
-> uv run python -m objdetect.cli.prepare_cone_dataset      # seeded 80/20 split + data yaml
-> uv run python -m objdetect.cli.train_cone_yolo --epochs 100 --device mps  # -> DATA/runs/cone_yolo26n/
-> # publish best weights to the path the app loads (config.WEIGHTS_DIR, committed):
-> cp DATA/runs/cone_yolo26n/weights/best.pt DATA/weights/cone_yolo26n.pt
-> # Faster R-CNN on the SAME cones — two-stage vs one-stage on a custom class (§7):
-> uv run python -m objdetect.cli.prepare_cone_coco                          # YOLO labels -> COCO format
-> uv run python -m objdetect.cli.train_cone_frcnn --device cpu --epochs 20  # ~50 min on CPU
-> cp DATA/checkpoints/faster_rcnn_cone_cosine.pth DATA/weights/faster_rcnn_cone.pth  # publish for the app
-> ```
-
-## How this report follows the Model-Report-File (MRF) guidelines
-
-The MRF spec (`Documentation/_MRF Requirements.md`) describes an Excel artifact
-where *each row is a hypothesis*, columns are *hyperparameters then ≤3 test-set
-metrics* with *% change vs a baseline row*, a *`Comments`* column, an explicit
-*best-model* statement, and *train-vs-validation* diagrams. This report keeps
-that structure in Markdown (the project's chosen format). Two MRF rules are
-adapted, and both adaptations are flagged where they occur:
-
-- **Baseline (MRF rule 3).** The MRF baseline is "the deployed model, else the
-  greediest statistical model (e.g. predict the most common class)." Object
-  detection has no meaningful most-common-class predictor (a no-prediction model
-  scores mAP ≈ 0, making every % change infinite and useless). The realistic
-  baseline a client starts from is the **off-the-shelf COCO-pretrained
-  Faster R-CNN**, so that is row 1 and all % changes are measured against it.
-- **Train-vs-validation diagrams (MRF rule 7).** These on-laptop demonstration
-  runs log per-epoch *training* loss and only end-of-run mAP, so a true per-epoch
-  train-vs-validation curve is out of scope; the schedule mechanism is shown via
-  the LR-vs-epoch and training-loss-vs-epoch curves instead. See the note in §6.
-
-## 1. Dataset
-
-- **Source:** COCO 2017 validation split (5 000 images), the everyday-context
-  benchmark named in the assignment.
-- **Subset for fine-tuning** (`config.SUBSET_CLASSES`): person, bicycle, car,
-  dog, cat, chair, bottle, cup, laptop, cell phone — ten common classes kept
-  small so experiments fit the project's time budget and run on-device.
-- **Preprocessing:** crowd boxes and degenerate (≤1 px) boxes dropped; images
-  scaled to float tensors in [0, 1]; horizontal-flip augmentation for training.
-- See `research/EDA_REPORT.md` for the full data analysis (Requirement 2).
+- **COCO 2017 val** (used in §3–4): 5 000 images; fine-tuning restricted to a 10-class everyday subset (`config.SUBSET_CLASSES`: person, bicycle, car, dog, cat, chair, bottle, cup, laptop, cell phone). Crowd and ≤1 px boxes dropped; horizontal-flip augmentation. Full analysis: `research/EDA_REPORT.md`.
+- **Traffic-cone dataset** (used in §5): 263 images of a single class outside COCO's 80, for the extension experiment — source and train/val split in §5.
 
 ## 2. Models compared
 
@@ -62,197 +12,78 @@ adapted, and both adaptations are flagged where they occur:
 | Faster R-CNN | Two-stage | ResNet-50 + FPN | 41.8 M | torchvision, COCO-pretrained |
 | YOLO26n | One-stage | anchor-free | 2.4 M | Ultralytics (YOLO26), COCO-pretrained |
 
-Both start from COCO-pretrained weights. The pretrained models are evaluated as
-the baseline comparison (§4); Faster R-CNN is additionally fine-tuned to
-demonstrate the training pipeline and the LR-schedule experiment (§6).
+**Metrics** (on the evaluation set):
 
-Parameter count is treated as a fixed *model attribute* (above), not one of the
-≤3 metrics, to honour the MRF's metric cap while preserving the size story.
+- **mAP@[.50:.95]** — the COCO primary score.
+- **mAP@.50** — a looser version.
+- **Inference speed (FPS)** — frames per second, i.e. images processed per second; compared between the two models rather than as absolute hardware benchmarks.
 
-## 3. Metrics (≤3, on the evaluation set)
+## 3. Pretrained baselines
 
-- **mAP@[.50:.95]** — COCO primary metric (averaged over 10 IoU thresholds).
-- **mAP@.50** — the classic looser metric.
-- **Inference speed (FPS)** — images/second on the evaluation device. Treat as
-  relative, not a hardware-spec figure.
-
-## 4. Hypothesis table — pretrained baselines (Requirements 3–4)
-
-Measured by `objdetect.cli.benchmark_baselines` on 200 subset images (CPU/MPS),
-through the shared `evaluate_coco_map` so both models go through one fair
-evaluation path. Rows are in creation order; **row 1 (Faster R-CNN) is the
-baseline**, and each metric shows its value with **% change vs that baseline**.
-Bold marks the best value in each metric column.
+Measured by `benchmark_baselines` on 200 subset images through the shared `evaluate_coco_map`. Both rows use off-the-shelf COCO-pretrained weights; Faster R-CNN (the established two-stage detector) is the reference the YOLO percentages are measured against.
 
 | # | Model (hyperparameters) | mAP@[.50:.95] | mAP@.50 | FPS (img/s) | Comments |
 |---|-------------------------|:-------------:|:-------:|:-----------:|----------|
-| 1 | **Faster R-CNN** — two-stage, ResNet-50+FPN, 41.8 M (baseline) | 0.467 | **0.699** | 3.2 | Baseline. Strongest at loose IoU — its "propose then refine" design + FPN recalls more objects. Slow and large. |
-| 2 | **YOLO26n** — one-stage, anchor-free, 2.4 M | **0.470** (+0.6%) | 0.622 (−11.0%) | **57.2** (+1670%) | Overall mAP essentially tied; ~18× faster and ~17× smaller. Loses recall at loose IoU but its fired boxes are precise. |
+| 1 | **Faster R-CNN** — two-stage, ResNet-50+FPN, 41.8 M (baseline) | 0.467 | **0.699** | 3.2 | Baseline. Strongest at loose IoU — "propose then refine" + FPN recalls more objects. Slow and large. |
+| 2 | **YOLO26n** — one-stage, anchor-free, 2.4 M | **0.470** (+0.6%) | 0.622 (−11.0%) | **57.2** (~18×) | Overall mAP tied; ~18× faster, ~17× smaller. Loses recall at loose IoU but its fired boxes are precise. |
 
-> **Best model: YOLO26n**, for this project's target (a Streamlit web app
-> detecting objects in everyday images). Overall accuracy is tied with the
-> baseline (+0.6% mAP@[.50:.95]) while it runs ~18× faster and is ~17× smaller —
-> decisive for interactive, deployable inference. **Choose Faster R-CNN instead
-> only if maximum recall at loose IoU is the priority** (it leads mAP@.50 by
-> +12.4%), e.g. when missing objects is costlier than latency.
+> **Best model: YOLO26n** for this project's target (a Streamlit app on everyday images): accuracy tied with the baseline (+0.6% mAP@[.50:.95]) while ~18× faster and ~17× smaller — decisive for interactive inference. **Pick Faster R-CNN only if max recall at loose IoU is the priority** (it leads mAP@.50 by +12.4%).
 
-**Reading the table — the project's central result:**
+## 4. Learning-rate schedule experiment
 
-- **Speed/size:** YOLO26n runs ~18× faster and is ~17× smaller — the one-stage
-  vs two-stage trade-off in raw form.
-- **Accuracy:** Faster R-CNN clearly wins at the *loose* IoU threshold
-  (mAP@.50 0.70 vs 0.62) — it localizes and recalls objects more reliably.
-- **The surprise worth discussing:** overall mAP@[.50:.95] is essentially *tied*
-  (0.467 vs 0.470). Modern one-stage detectors have largely closed the accuracy
-  gap; YOLO26's boxes are very precise when it fires, while Faster R-CNN's edge
-  is catching more objects at moderate overlap.
+Two Faster R-CNN runs, **identical except for the learning-rate schedule** (`run_experiments`), both evaluated on the same ~50 images. The percentages in row 2 show how step decay compares to the cosine run in row 1 (the baseline).
 
-This single table is the heart of the presentation: *which detector you pick
-depends on whether you are bounded by accuracy/recall or by latency/size.*
+Shared settings:
 
-## 5. Fine-tuning pipeline
+- base learning rate 0.005
+- SGD (momentum 0.9, weight decay 5e-4)
+- batch size 2
+- seed 42
+- a capped number of batches
 
-The fine-tuning pipeline (`objdetect.cli.train`, `objdetect.cli.run_experiments`) was
-validated end-to-end on the subset: training loss decreases and checkpoints and
-history are saved. Example smoke run (Faster R-CNN, cosine schedule, CPU):
-
-```
-epoch 1/3  lr=0.00500  loss=1.4337
-epoch 2/3  lr=0.00375  loss=0.9316
-epoch 3/3  lr=0.00126  loss=0.9344
-```
-
-The smoke configuration (few epochs, capped batches) exists to prove the
-pipeline on a laptop. A longer fine-tune (all subset images, ~10–15 epochs) uses
-the same script minus `--max-batches`; see the LR-schedule experiment below,
-which uses this pipeline.
-
-## 6. Hypothesis table — LR-schedule experiment (Requirement 5)
-
-Two Faster R-CNN fine-tuning runs, **identical except for the LR schedule**
-(same seed, epochs, base LR, data), produced by `objdetect.cli.run_experiments`.
-This is a self-contained sub-experiment with its own consistent eval slice
-(~50 images), so % change is measured **within the experiment, vs the
-cosine run (row 1, created first)**.
-
-**The schedules themselves** (`objdetect.cli.plot_lr_schedules`):
+This is a quick demonstration of the schedule *mechanism*, not a fully trained model — so the absolute mAP (~0.09) is far lower than the pretrained models in §3 (~0.47), as expected. The figures below show learning rate and training loss per epoch (no train-vs-validation split is logged).
 
 ![LR schedules](figures/lr_schedules.png)
-
-- **Step decay** holds the LR flat, then multiplies it by 0.1 every few epochs —
-  a staircase.
-- **Cosine annealing** glides the LR down a half-cosine from the base value to a
-  small floor — smooth, spending longer near the extremes.
-
-**The actual runs** (5 epochs, capped batches — a demonstration, not a converged
-model):
 
 ![LR experiment](figures/lr_experiment_comparison.png)
 
 | # | Schedule (hyperparameters) | Final train loss | mAP@[.50:.95] | mAP@.50 | Comments |
 |---|----------------------------|:----------------:|:-------------:|:-------:|----------|
-| 1 | **Cosine annealing** — 5 ep, base LR 0.005 (baseline) | **0.742** | 0.092 | 0.168 | Baseline of the experiment. Smooth late-epoch decay let training keep settling → lowest final loss. LR: 0.0050→0.0045→0.0033→0.0017→0.0005. |
-| 2 | **Step decay** — 5 ep, base LR 0.005 | 0.786 (+5.9%, worse) | **0.096** (+4.3%) | **0.180** (+7.0%) | Holds a high LR until its scheduled ×0.1 drop → higher final loss. mAP edges ahead, but within noise at this scale. LR: 0.0050→0.0050→0.0050→0.0005→0.0005. |
+| 1 | **Cosine annealing** — `CosineAnnealingLR`, 5 ep, `eta_min=1e-5` (baseline) | **0.742** | 0.092 | 0.168 | Glides the LR down a half-cosine to a small floor; smooth late decay → lowest final loss. |
+| 2 | **Step decay** — `StepLR`, 5 ep, `step_size=3`, `gamma=0.1` | 0.786 (+6.0%, worse) | **0.096** (+4.3%) | **0.180** (+7.0%) | Holds the LR flat, then ×0.1 every 3 epochs (staircase); higher loss, mAP edge within noise. |
 
-> **Best schedule (these runs): cosine annealing.** It reached the lowest final
-> training loss (0.742 vs 0.786), the intended Requirement-5 takeaway. The mAP
-> gap favouring step decay is within noise at this demonstration scale (~0.09 mAP
-> on 50 images) and is not a reliable signal.
+> **Best schedule (these runs): cosine annealing** — lowest final training loss (0.742 vs 0.786). The mAP gap favouring step decay is within noise at this scale (~0.09 mAP on 50 images).
 
-**What the experiment shows:**
+## 5. Extension — fine-tuning a new class (traffic cone)
 
-- The **LR-vs-epoch curves clearly differ** — smooth cosine glide vs step
-  staircase — which is exactly what Requirement 5 asks to demonstrate.
-- Both runs converge quickly from the pretrained init (loss drops ~1.5 → ~0.75
-  within one epoch).
-- Cosine reached a slightly lower final loss; step decay holds a comparatively
-  high LR until its scheduled drop.
+**Hypothesis:** both detector families extend to a class **outside COCO's 80** by fine-tuning on a small single-class set — also giving a two-stage vs one-stage comparison on a custom class.
 
-> **Honesty note for the defense (MRF rule 7).** These are deliberately *small*
-> runs (≈100 training images per run, evaluated on ~50), so the absolute mAP
-> (~0.09) is far below the pretrained baseline in §4 — they exist to demonstrate
-> the schedule *mechanism* on a laptop, not to beat the baseline. They log
-> per-epoch *training* loss and only end-of-run mAP, so a full
-> *train-vs-validation* per-epoch curve is out of scope here; the LR-vs-epoch and
-> training-loss-vs-epoch curves above are what the experiment reports, and they
-> are sufficient to show the difference between the two schedules.
+- **Dataset:** [krisstern/traffic-cone-image-dataset](https://github.com/krisstern/traffic-cone-image-dataset) — 263 images, single class, seeded (SEED=42) **80/20 split: 210 train / 53 val** (both models use the *same* split).
+- **YOLO:** from `yolo26n.pt`, imgsz 640, batch 16, AdamW (lr≈0.002), `patience=30`, MPS. Trained at two budgets: **100 ep** (deployed, ~32 min) and **20 ep** (budget-matched to Faster R-CNN, ~6 min).
+- **Faster R-CNN:** COCO-pretrained backbone + fresh 1-class head, 20 ep cosine, base LR 0.005, 512 px, CPU (training over-commits MPS memory). ~50 min on M3. Cone labels converted to COCO (`prepare_cone_coco`) so both score through the *same* `evaluate_coco_map`.
 
-## 7. Extension — fine-tuning a new class (traffic cone)
+Three runs on the same 53-image val split. **Row 1 (Cone Faster R-CNN) is the baseline.** The recipes still differ beyond epochs (YOLO uses AdamW / 640 px / MPS, Faster R-CNN uses SGD / 512 px / CPU), so this is a best-effort comparison, not a fully controlled ablation.
 
-**Hypothesis:** **both** detector families can be extended to a class **outside
-COCO's 80** by fine-tuning on a small, single-class dataset — yielding a
-deployable model without retraining on COCO. Fine-tuning *both* on the same
-class also gives a **two-stage vs. one-stage comparison on a custom class**,
-complementing the pretrained-baseline comparison in §4.
+| # | Model (hyperparameters) | mAP@[.50:.95] | mAP@.50 | Comments |
+|---|-------------------------|:-------------:|:-------:|----------|
+| 1 | **Cone Faster R-CNN** — two-stage, 1 class, 20 ep cosine, 210 train imgs (baseline) | 0.647 | 0.896 | Reference. Already strong at only 20 epochs; train loss 0.50→0.086. |
+| 2 | **Cone YOLO26n** — one-stage, 1 class, 20 ep, 210 train imgs | 0.589 (−9.0%) | 0.829 (−7.5%) | Budget-matched: at 20 ep YOLO trails Faster R-CNN on both metrics. |
+| 3 | **Cone YOLO26n** — one-stage, 1 class, **100 ep**, 210 train imgs (deployed) | **0.678** (+4.8%) | **0.917** (+2.3%) | Best result, but needs 5× the epochs to pass Faster R-CNN. |
 
-- **Dataset:** [krisstern/traffic-cone-image-dataset](https://github.com/krisstern/traffic-cone-image-dataset)
-  — 263 images, single class `traffic cone`, YOLO-format labels, no known
-  copyright. Laid out by `objdetect.cli.prepare_cone_dataset` into a reproducible,
-  seeded (SEED=42) **80/20 split: 210 train / 53 val** (both models use the
-  *same* split for a fair comparison).
-- **YOLO config:** fine-tune from `yolo26n.pt`, 100 epochs, imgsz 640, batch 16,
-  optimizer `auto` (AdamW, lr≈0.002), `patience=30`, `device=mps`. ~32 min on the
-  M3 (≈26 s/epoch).
-- **Faster R-CNN config:** COCO-pretrained ResNet-50+FPN backbone with a **fresh
-  1-class head**, 20 epochs cosine, base LR 0.005, batch 1, 512 px input. The
-  cone YOLO labels are converted to COCO format
-  (`objdetect.cli.prepare_cone_coco`) so it trains and is scored through the
-  *same* `evaluate_coco_map` path as everything else. ~50 min on the M3 **CPU**
-  (Faster R-CNN training over-commits MPS unified memory, so CPU is used).
-- **Hardware:** local Apple Silicon — MacBook Air **M3** (10-core GPU, 16 GB);
-  both runs complete comfortably on-device.
+![Cone Faster R-CNN training — 20 ep](figures/cone_frcnn_training.png)
+![Cone YOLO26n training — 20 ep](figures/cone_yolo_training_20ep.png)
 
-| # | Model (hyperparameters) | Precision | Recall | mAP@.50 | mAP@[.50:.95] | Comments |
-|---|-------------------------|:---------:|:------:|:-------:|:-------------:|----------|
-| 1 | **Cone YOLO26n** — one-stage, fine-tuned, 1 class, 100 ep, 210 train imgs | 0.894 | 0.847 | **0.917** | **0.678** | Strong for a tiny single-class set; an easy, distinct class converges fast. Held-out 53-image val split. |
-| 2 | **Cone Faster R-CNN** — two-stage, fine-tuned, 1 class, 20 ep cosine, 210 train imgs | — | — | 0.896 | 0.647 | Essentially tied with YOLO (within ~0.02–0.03 mAP); training loss converged 0.50 → 0.086. P/R not reported — the COCO `evaluate_coco_map` path returns mAP, not P/R at a fixed threshold. |
+> **Verdict: at an equal 20-epoch budget, the two-stage model wins.**
+>
+> - Equal budget (20 ep): Faster R-CNN **0.896 / 0.647** vs YOLO **0.829 / 0.589** (mAP@.50 / mAP@[.50:.95]).
+> - YOLO passes it only at 100 ep (**0.917 / 0.678**) — ~5× the training.
+> - So Faster R-CNN is the more epoch-efficient learner; YOLO's edge is its ceiling with more epochs plus speed/size, not faster convergence.
+> - Caveat: easy, distinctive class on 263 images — the high mAP reflects the class, not a large-scale result.
 
-Both detectors converge well on the class. Training curves:
 
-![YOLO26n cone training](figures/cone_yolo_training.png)
+## 6. Conclusions
 
-![Faster R-CNN cone training](figures/cone_frcnn_training.png)
-
-> **Two-stage vs. one-stage on a custom class.** Trained on the *same* 210-image
-> split, the two detectors land close together — YOLO26n mAP@.50 0.917 /
-> mAP@[.50:.95] 0.678 vs. Faster R-CNN 0.896 / 0.647. So §4's headline (the
-> families are accuracy-tied; YOLO is far faster and smaller) **holds even when
-> learning a brand-new class from scratch**: both adapt well from 210 images,
-> YOLO is marginally ahead on both metrics and trains far faster, while the
-> two-stage model stays within ~0.02–0.03 mAP.
-
-> **Outcome:** single-class fine-tuning makes the model forget COCO's 80 classes
-> (expected catastrophic forgetting), so the cone model is not deployed alone.
-> Instead the app exposes a combined **"YOLO26n + Cones (81 classes)"** option
-> (`EnsembleDetector`) that runs stock YOLO26n and the cone model together and
-> concatenates their detections — covering all 81 classes in one pass.
-
-**Honesty note for the defense.** This is a deliberately small, *easy* class on
-263 images; the high mAP for both models reflects how distinctive cones are, not
-a large-scale result. The two numbers are directly comparable (same split, same
-COCO mAP evaluator), though Faster R-CNN was trained at 512 px on CPU (memory
-limits) while YOLO used 640 px on MPS, so the comparison is fair on accuracy but
-not a like-for-like speed benchmark. The combined ensemble assumes disjoint
-classes (COCO vs. cone) and applies no cross-model NMS, which is safe here
-because the class sets do not overlap.
-
-## 8. Conclusions
-
-- **The accuracy/speed trade-off is real and measurable.** On the same COCO
-  subset, YOLO26n is ~18× faster and ~17× smaller than Faster R-CNN, while
-  Faster R-CNN is more reliable at loose IoU (mAP@.50 0.70 vs 0.62). Overall
-  mAP@[.50:.95] is essentially tied — modern one-stage detectors have closed the
-  historical accuracy gap.
-- **Best model: YOLO26n** for the web-app target (tied accuracy, far faster and
-  smaller); **Faster R-CNN** when maximum recall / small-object reliability
-  outranks latency and size.
-- **The training pipeline works end-to-end**, and the LR-schedule experiment
-  demonstrates both required schedules, with cosine annealing edging out step
-  decay on final training loss in these runs.
-- **Both detector families extend to new classes — and stay tied.** Fine-tuning
-  on a small single-class set (traffic cone, not in COCO) reached mAP@.50 ≈ 0.90
-  for *both* YOLO26n (0.917, ~32 min MPS) and Faster R-CNN (0.896, ~50 min CPU)
-  on the same 210-image split — essentially tied, mirroring §4. YOLO ships as a
-  third app model plus a combined 81-class ensemble (§7).
-- **Everything is reproducible** from the commands at the top of this report and
-  is covered by an automated test suite (exercise-style unit tests + BDD).
+- **The accuracy/speed trade-off is real and measurable:** YOLO26n is ~18× faster and ~17× smaller than Faster R-CNN; FRCNN is more reliable at loose IoU (mAP@.50 0.70 vs 0.62); overall mAP@[.50:.95] is essentially tied, as modern one-stage detectors have closed the historical accuracy gap.
+- **Best model: YOLO26n** for the web-app target; **Faster R-CNN** when max recall outranks latency/size.
+- **The LR-schedule experiment** demonstrates both required schedules, cosine edging out step decay on final training loss.
+- **Both families extend to a new class, but the two-stage model is more epoch-efficient:** at an equal 20-epoch budget Faster R-CNN leads (mAP@.50 0.896 vs 0.829), and YOLO overtakes it only with ~5× the epochs (0.917 at 100 ep). Each family ships an 81-class "+ Cones" ensemble in the app.

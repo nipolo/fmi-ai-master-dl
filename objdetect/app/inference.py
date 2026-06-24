@@ -10,6 +10,7 @@ from objdetect.models import build_detector
 from objdetect.models.base import Detection, Detector
 
 CONE_WEIGHTS = config.CONE_WEIGHTS
+CONE_WEIGHTS_20EP = config.CONE_WEIGHTS_20EP
 CONE_FRCNN_WEIGHTS = config.CONE_FRCNN_WEIGHTS
 
 # Friendly label -> (builder, kwargs). The cone model only detects its one class,
@@ -34,13 +35,23 @@ AVAILABLE_MODELS = {
         },
     ),
     "YOLO26n (one-stage)": ("yolo", {"weights": config.YOLO_BASE_WEIGHTS}),
-    "YOLO26n + Cones (81 classes)": (
+    "YOLO26n + Cones — 100 ep (81 classes)": (
         "ensemble",
         {
-            "name": "YOLO26n + Cones",
+            "name": "YOLO26n + Cones (100 ep)",
             "members": [
                 ("yolo", {"weights": config.YOLO_BASE_WEIGHTS}),
                 ("yolo", {"weights": CONE_WEIGHTS}),
+            ],
+        },
+    ),
+    "YOLO26n + Cones — 20 ep (81 classes)": (
+        "ensemble",
+        {
+            "name": "YOLO26n + Cones (20 ep)",
+            "members": [
+                ("yolo", {"weights": config.YOLO_BASE_WEIGHTS}),
+                ("yolo", {"weights": CONE_WEIGHTS_20EP}),
             ],
         },
     ),

@@ -13,8 +13,9 @@ Run the fine-tune:
     uv run python -m objdetect.cli.train_cone_yolo --epochs 100 --device mps
     uv run python -m objdetect.cli.train_cone_yolo --epochs 5 --device cpu   # quick smoke
 
-Writes reports/figures/cone_yolo_training.png + reports/cone_yolo_results.json.
-Publish weights for the app:
+Writes reports/figures/cone_yolo_training_<epochs>ep.png +
+reports/cone_yolo_results_<epochs>ep.json (suffixed by epoch budget, so runs at
+different budgets don't overwrite each other). Publish weights for the app:
     cp DATA/runs/cone_yolo26n/weights/best.pt DATA/weights/cone_yolo26n.pt
 """
 
@@ -27,13 +28,19 @@ from ultralytics import YOLO
 from objdetect import config
 
 
-def _write_report_artifacts(run_dir, metrics) -> None:
-    """Copy the training curve and write a metrics JSON into reports/."""
+def _write_report_artifacts(run_dir, metrics, epochs) -> None:
+    """Copy the training curve and write a metrics JSON into reports/.
+
+    Filenames are suffixed with the epoch budget (e.g. ``_20ep``) so runs at
+    different budgets don't overwrite each other's artifacts.
+    """
     config.FIGURES_DIR.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(run_dir / "results.png", config.FIGURES_DIR / "cone_yolo_training.png")
+    suffix = f"_{epochs}ep"
+    shutil.copy2(run_dir / "results.png", config.FIGURES_DIR / f"cone_yolo_training{suffix}.png")
 
     results = {
         "model": "yolo26n",
+        "epochs": epochs,
         "dataset": "traffic_cone (held-out val split)",
         "metrics": {
             "mAP": float(metrics.box.map),
@@ -42,7 +49,7 @@ def _write_report_artifacts(run_dir, metrics) -> None:
             "recall": float(metrics.box.mr),
         },
     }
-    (config.REPORTS_DIR / "cone_yolo_results.json").write_text(json.dumps(results, indent=2))
+    (config.REPORTS_DIR / f"cone_yolo_results{suffix}.json").write_text(json.dumps(results, indent=2))
     return results["metrics"]
 
 
@@ -66,7 +73,7 @@ def main() -> int:
     )
 
     metrics = model.val(data=str(config.CONE_YAML), split="val", device=args.device)
-    summary = _write_report_artifacts(runs_dir / args.name, metrics)
+    summary = _write_report_artifacts(runs_dir / args.name, metrics, args.epochs)
 
     print("val metrics:", json.dumps(summary, indent=2))
     print(f"weights -> {runs_dir / args.name / 'weights' / 'best.pt'}")

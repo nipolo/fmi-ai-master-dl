@@ -67,6 +67,12 @@ Documentation/        # requirements PDF, project & learning plans
 ## Conventions
 
 - Code, comments, docs, report, and presentation: **English only** (confirmed).
+- **Markdown line width:** do not hard-wrap prose — write each paragraph, bullet,
+  and blockquote on a single line and let the viewer wrap it. **Exceptions** (keep
+  whatever wrapping suits them): presentation/slide files (e.g.
+  `reports/PRESENTATION.md`), `CLAUDE.md` and other `.claude/` instruction files,
+  and any file whose format depends on line breaks. This applies to prose only —
+  never reflow tables, code blocks, or YAML/Gherkin.
 - **Unit test style** (must match course exercises, see `Documentation/tests/`):
   `unittest.TestCase` classes, one class per unit named `Test<FunctionName>`,
   methods named `test_when_<condition>_then_<expected>`, with explicit

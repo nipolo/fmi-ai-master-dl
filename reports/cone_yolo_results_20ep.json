@@ -1,0 +1,10 @@
+{
+  "model": "yolo26n",
+  "dataset": "traffic_cone (held-out val split)",
+  "metrics": {
+    "mAP": 0.5886467623815481,
+    "mAP_50": 0.829003045142714,
+    "precision": 0.7619311479237836,
+    "recall": 0.7379912663755459
+  }
+}

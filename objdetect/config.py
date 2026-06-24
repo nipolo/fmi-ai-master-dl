@@ -33,6 +33,7 @@ EDA_SUMMARY_FILE = RESEARCH_DIR / "eda_summary.json"
 WEIGHTS_DIR = DATA_DIR / "weights"
 YOLO_BASE_WEIGHTS = str(WEIGHTS_DIR / "yolo26n.pt")
 CONE_WEIGHTS = str(WEIGHTS_DIR / "cone_yolo26n.pt")
+CONE_WEIGHTS_20EP = str(WEIGHTS_DIR / "cone_yolo26n_20ep.pt")
 CONE_FRCNN_WEIGHTS = str(WEIGHTS_DIR / "faster_rcnn_cone.pth")
 
 TRAFFIC_CONE_DIR = DATA_DIR / "traffic_cone"

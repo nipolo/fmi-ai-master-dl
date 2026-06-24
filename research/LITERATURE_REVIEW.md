@@ -42,13 +42,13 @@ The assignment requires experiments with **both** Faster R-CNN and **YOLO** — 
 ## 4. Training techniques used
 
 - **Transfer learning / fine-tuning**: both models start from COCO-pretrained weights. YOLO26 is evaluated directly as a pretrained baseline; Faster R-CNN is additionally fine-tuned — its classifier head is replaced with a fresh one sized for the 10-class subset, then the whole network (backbone included) is trained, rather than training from scratch. This is standard practice and essential given the compute budget.
-- **Learning-rate scheduling** (Req. 5): the learning rate is decayed as training proceeds — large early steps to make progress, small later steps to settle into a minimum. The project demonstrates two schedules:
+- **Learning-rate scheduling**: the learning rate is decayed as training proceeds — large early steps to make progress, small later steps to settle into a minimum. The project demonstrates two schedules:
   - **Step decay**: multiply the LR by a factor every *k* epochs (a staircase).
   - **Cosine annealing** (Loshchilov & Hutter, 2017): follow a half-cosine from the initial LR down to a small floor — a smooth decay shown to improve convergence in many settings.
 
 ## 5. Dataset
 
-**COCO 2017** (Lin et al., 2014): 80 classes of common objects in natural context. The project uses the validation split (5 000 images) restricted to a 10-class everyday-context subset for affordable fine-tuning. The exploratory analysis (Req. 2, see `EDA_REPORT.md`) characterizes class imbalance, object sizes, scene density, class co-occurrence, and annotation anomalies.
+**COCO 2017** (Lin et al., 2014): 80 classes of common objects in natural context. The project uses the validation split (5 000 images) restricted to a 10-class everyday-context subset for affordable fine-tuning. The exploratory analysis (see `EDA_REPORT.md`) characterizes class imbalance, object sizes, scene density, class co-occurrence, and annotation anomalies.
 
 ## 6. Key references
 
