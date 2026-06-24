@@ -10,10 +10,10 @@
       "justMyCode": false
     },
     {
-      "name": "Debug script: objdetect.cli.train (cosine)",
+      "name": "Debug script: objdetect.cli.training.train (cosine)",
       "type": "debugpy",
       "request": "launch",
-      "module": "objdetect.cli.train",
+      "module": "objdetect.cli.training.train",
       "args": ["--scheduler", "cosine", "--epochs", "6"],
       "console": "integratedTerminal",
       "justMyCode": false

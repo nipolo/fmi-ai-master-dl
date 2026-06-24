@@ -46,7 +46,8 @@
       "Bash(cp -p DATA/checkpoints/cone_yolo26n.pt DATA/weights/cone_yolo26n.pt)",
       "Bash(echo \"exit: $?\")",
       "Bash(python3 -c \"import json; [json.load\\(open\\(p\\)\\) for p in \\('.vscode/tasks.json','.vscode/launch.json'\\)]; print\\('OK'\\)\")",
-      "Bash(grep -vE '^\\\\s*#|^\\\\s*$|^\\\\s*\"\"\"|^\\\\s*\"|^\\\\s*'\"'\"'|^\\\\s*[A-Z].*\\\\.$|^\\\\s*[a-zA-Z].* [a-z].*[a-z]$')"
+      "Bash(grep -vE '^\\\\s*#|^\\\\s*$|^\\\\s*\"\"\"|^\\\\s*\"|^\\\\s*'\"'\"'|^\\\\s*[A-Z].*\\\\.$|^\\\\s*[a-zA-Z].* [a-z].*[a-z]$')",
+      "Bash(python3 -c \"import json; json.load\\(open\\('.vscode/launch.json'\\)\\); print\\('launch.json valid ✓'\\)\")"
     ]
   }
 }

@@ -6,14 +6,11 @@ paginate: true
 
 # Object Detection in Everyday Images
 
-**Deep Learning course project — Topic 4**
+**Deep Learning course project — Topic 4: Object Recognition**
 
 Faster R-CNN vs YOLO on COCO, with a Streamlit web app
 
-Borislav Valkov
-
-> Render these slides with: `marp reports/PRESENTATION.md` (or open in the
-> Marp VS Code extension). Figures are in `reports/figures/`.
+Borislav Valkov · AI Master · 4MI3400759
 
 ---
 
@@ -58,7 +55,7 @@ the story of the field.
 - **4 952 images, 36 781 annotations, 80 classes**
 - We fine-tune on a **10-class everyday subset** (person, car, dog, cat, chair…)
 
-![w:520](figures/eda_class_distribution.png)
+![w:520](../research/figures/eda_class_distribution.png)
 
 Severe **imbalance**: person 11 004 instances vs toaster 9 (~1 200:1).
 
@@ -66,7 +63,7 @@ Severe **imbalance**: person 11 004 instances vs toaster 9 (~1 200:1).
 
 ## The data — what makes it hard
 
-![w:460](figures/eda_boxes_per_image.png) ![w:460](figures/eda_relative_area.png)
+![w:460](../research/figures/eda_boxes_per_image.png) ![w:460](../research/figures/eda_relative_area.png)
 
 - **7.4 objects/image** on average, up to 63 — cluttered scenes.
 - **47% of objects are tiny** (<1% of image area) — the hardest case.
@@ -79,8 +76,8 @@ Severe **imbalance**: person 11 004 instances vs toaster 9 (~1 200:1).
 
 | Model | mAP@.50:.95 | mAP@.50 | FPS | Params |
 |--|:--:|:--:|:--:|:--:|
-| Faster R-CNN | 0.467 | **0.699** | 3.2 | 41.8 M |
-| YOLO26n | 0.470 | 0.622 | **57.2** | 2.4 M |
+| Faster R-CNN | 0.467 | **0.699** | 3.2 | **41.8 M** |
+| YOLO26n | **0.470** | 0.622 | **57.2** | 2.4 M |
 
 - YOLO: **~18× faster, ~17× smaller**.
 - Faster R-CNN: **better at loose IoU** (more reliable recall).
@@ -97,7 +94,7 @@ more false positives. The trade-off, made visible.
 
 ---
 
-## Learning-rate schedules (Req. 5)
+## Learning-rate schedules
 
 ![w:560](figures/lr_schedules.png)
 
@@ -107,13 +104,13 @@ more false positives. The trade-off, made visible.
 
 ---
 
-## The web app (Req. 6)
+## The web app
 
 - **Streamlit**: upload a photo → pick model → confidence slider → boxes + table.
 - Logic split from UI (`inference.py`) so it is **testable**.
 - **Tests:**
-  - exercise-style `unittest` (Arrange/Act/Assert) for data, schedulers,
-    inference, visualization;
+  - exercise-style `unittest` (Arrange/Act/Assert) for EDA, schedulers,
+    inference, visualization, the model ensemble & seeding;
   - **BDD** with `pytest-bdd`: Gherkin scenarios for detecting & thresholding.
 - `uv run pytest` → **all green**.
 

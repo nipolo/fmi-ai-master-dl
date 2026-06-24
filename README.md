@@ -67,6 +67,7 @@ uv run python -m objdetect.cli.figures.compare_models_visual                  # 
 
 # App
 uv run streamlit run objdetect/app/main.py
+
 ```
 
 On first run each model downloads its pretrained weights automatically (YOLO via ultralytics, Faster R-CNN via torchvision) — needs internet once; cached afterwards. Only the data and EDA/training/benchmark commands need the COCO dataset (`download_data.py`); the app runs on uploaded photos without it.
@@ -85,6 +86,7 @@ Pre-configured tasks and debug profiles live in `.vscode/`.
 | run:app   | launch the Streamlit web app                                |
 | run:eda   | generate EDA figures + summary from COCO data               |
 | run:tests | run the BDD + unit suite (also the default _Run Test Task_) |
+| gen:pptx | render `reports/PRESENTATION.md` to `PRESENTATION.pptx` (Marp) |
 
 **Debugging** (Run and Debug panel, or `F5`) — uses the `.venv` interpreter:
 

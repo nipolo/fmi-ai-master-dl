@@ -51,43 +51,10 @@
       }
     },
     {
-      "label": "nnga:regen-presentation",
+      "label": "gen:pptx",
       "type": "shell",
-      "command": "sudo marp _NNGA/PRESENTATION.md --pptx --allow-local-files",
-      "detail": "Render _NNGA/PRESENTATION.md to PRESENTATION.pptx (Marp)",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "nnga:run-ga",
-      "type": "shell",
-      "command": "uv run python _NNGA/src/evolve_hyperparameters.py --data DATA/traffic_cone/traffic_cone.yaml --epochs 10 --iterations 20 --device mps",
-      "detail": "Evolve YOLO hyperparameters with the GA (traffic-cone, on-device MPS)",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
-    },
-    {
-      "label": "nnga:plot-evolution",
-      "type": "shell",
-      "command": "uv run python _NNGA/src/plot_evolution.py",
-      "detail": "Regenerate the GA fitness-vs-generation figure from tune_results.ndjson",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "nnga:zip",
-      "type": "shell",
-      "command": "rm -rf .nnga_stage NNGA.zip && rsync -a --exclude runs --exclude Documentation --exclude .venv --exclude __pycache__ --exclude '.DS_Store' _NNGA/ .nnga_stage/NNGA/ && (cd .nnga_stage && zip -rq ../NNGA.zip NNGA) && rm -rf .nnga_stage",
-      "detail": "Package _NNGA/ as NNGA.zip (top folder 'NNGA', no underscore; excludes runs, Documentation, .venv, caches)",
+      "command": "marp reports/PRESENTATION.md --pptx --allow-local-files",
+      "detail": "Render reports/PRESENTATION.md to PRESENTATION.pptx (Marp)",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",

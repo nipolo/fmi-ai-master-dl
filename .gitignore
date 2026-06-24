@@ -205,5 +205,8 @@ checkpoints/
 # runtime are committed so the demo runs without re-downloading or re-training.
 !DATA/weights/
 !DATA/weights/*.pt
+# Generated presentation (rendered from reports/PRESENTATION.md via Marp)
+reports/*.pptx
+reports/*.pdf
 # macOS
 .DS_Store
