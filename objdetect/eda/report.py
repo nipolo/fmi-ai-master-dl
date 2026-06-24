@@ -1,13 +1,4 @@
-"""Generate the COCO EDA figures and a data summary (Requirement 2).
-
-Runs the analysis functions in objdetect.eda over the downloaded COCO
-val2017 annotations, saves plots into research/figures/, and writes a JSON
-summary the EDA report quotes. Keeping this in the package (not only a
-notebook) means the analysis is reproducible with one command and is covered
-by tests.
-
-Usage:  uv run python -m objdetect.eda.report
-"""
+"""Generate the COCO EDA figures and a data summary (Requirement 2)."""
 
 import json
 
@@ -29,7 +20,6 @@ def main() -> int:
     per_image = eda.boxes_per_image(annotations)
     anomalies = eda.find_anomalies(annotations)
 
-    # --- Figure 1: class distribution (imbalance) ---------------------------
     plt.figure(figsize=(12, 6))
     top = distribution.head(25)
     sns.barplot(data=top, x="instances", y="category", hue="category", legend=False,
@@ -41,7 +31,6 @@ def main() -> int:
     plt.savefig(config.EDA_FIGURES_DIR / "eda_class_distribution.png", dpi=120)
     plt.close()
 
-    # --- Figure 2: boxes per image (scene density) --------------------------
     plt.figure(figsize=(9, 5))
     sns.histplot(per_image, bins=range(0, per_image.max() + 2), color="steelblue")
     plt.title("Objects per image")
@@ -51,7 +40,6 @@ def main() -> int:
     plt.savefig(config.EDA_FIGURES_DIR / "eda_boxes_per_image.png", dpi=120)
     plt.close()
 
-    # --- Figure 3: relative box area (object scale) -------------------------
     plt.figure(figsize=(9, 5))
     sns.histplot(annotations["relative_area"].clip(upper=0.5), bins=50,
                  color="indianred")
@@ -62,7 +50,6 @@ def main() -> int:
     plt.savefig(config.EDA_FIGURES_DIR / "eda_relative_area.png", dpi=120)
     plt.close()
 
-    # --- Figure 4: class co-occurrence (statistical dependencies) -----------
     cooc = eda.class_cooccurrence(annotations, top_n=15)
     plt.figure(figsize=(10, 8))
     sns.heatmap(cooc, annot=False, cmap="magma", square=True)
@@ -71,7 +58,6 @@ def main() -> int:
     plt.savefig(config.EDA_FIGURES_DIR / "eda_cooccurrence.png", dpi=120)
     plt.close()
 
-    # --- Numeric summary the report quotes ----------------------------------
     summary = {
         "num_images": int(annotations["image_id"].nunique()),
         "num_annotations": int(len(annotations)),

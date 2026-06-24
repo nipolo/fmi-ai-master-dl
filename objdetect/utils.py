@@ -9,11 +9,7 @@ from objdetect import config
 
 
 def resolve_device(device: str | torch.device | None = None) -> torch.device:
-    """Pick the best available device unless one is explicitly given.
-
-    Preference order: explicit argument, then CUDA (if present), then Apple
-    Silicon MPS (local Mac), then CPU.
-    """
+    """Pick the best available device unless one is explicitly given."""
     if device is not None:
         return torch.device(device)
     if torch.cuda.is_available():

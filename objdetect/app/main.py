@@ -1,11 +1,4 @@
-"""Streamlit web application for object detection.
-
-Run with:  uv run streamlit run objdetect/app/main.py // VS Code Task -> run:app
-
-The UI lets the user upload an everyday photo, pick a detector, set a
-confidence threshold and see the detected objects drawn on the image with a
-table and per-class counts.
-"""
+"""Streamlit web application for object detection."""
 
 import streamlit as st
 from PIL import Image, ImageOps
@@ -23,12 +16,10 @@ from objdetect.visualization import draw_detections
 
 @st.cache_resource(show_spinner="Loading model…")
 def _get_model(display_name: str):
-    """Cache one instance per model so weights load only once per session."""
     return load_model(display_name)
 
 
 def _hide_streamlit_chrome() -> None:
-    """Hide the Deploy button and ⋮ menu, but keep the sidebar expand control."""
     st.markdown(
         """
         <style>
@@ -42,7 +33,6 @@ def _hide_streamlit_chrome() -> None:
 
 
 def _render_sidebar() -> tuple[str, float]:
-    """Draw the Settings panel and return the chosen (model name, threshold)."""
     with st.sidebar:
         st.header("Settings")
         model_name = st.selectbox("Model", list(AVAILABLE_MODELS))
@@ -64,7 +54,6 @@ def main() -> None:
 
     model_name, score_threshold = _render_sidebar()
 
-    # --- Upload section ---
     uploaded = st.file_uploader(
         "Upload an image", type=["jpg", "jpeg", "png", "bmp", "webp"]
     )
@@ -72,7 +61,6 @@ def main() -> None:
         st.info("Upload a photo to run detection.")
         return
 
-    # --- Run the selected detector on the uploaded image ---
     image = ImageOps.exif_transpose(Image.open(uploaded)).convert("RGB")
     try:
         model = _get_model(model_name)
@@ -83,7 +71,6 @@ def main() -> None:
     with st.spinner("Running detection…"):
         detections = run_detection(model, image, score_threshold=score_threshold)
 
-    # --- Show original vs. detections side by side ---
     left, right = st.columns(2)
     with left:
         st.subheader("Original")
@@ -106,7 +93,6 @@ def main() -> None:
     )
     st.caption("Select one or more rows to show only those boxes on the photo.")
 
-    # --- Results table; selecting rows filters the boxes drawn above ---
     table = st.dataframe(
         detections_to_frame(detections),
         use_container_width=True,

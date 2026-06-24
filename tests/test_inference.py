@@ -1,11 +1,4 @@
-"""Unit tests for the app-facing inference helpers.
-
-The ``detections_to_frame`` and ``summarize_counts`` behaviours are described
-by Gherkin scenarios in ``tests/features/app_workflow.feature`` instead, so they
-are intentionally not duplicated here. ``run_detection`` keeps a unit test
-because it pins the full descending sort order, which the feature only checks
-at the top position.
-"""
+"""Unit tests for the app-facing inference helpers."""
 
 import unittest
 
@@ -18,7 +11,6 @@ from tests.conftest import FakeDetector
 
 
 def _three_detections() -> list[Detection]:
-    """Three distinct detections whose order the tests rely on."""
     return [
         Detection(label="tv", score=0.88, box=(1.0, 1.0, 2.0, 2.0)),
         Detection(label="chair", score=0.60, box=(3.0, 3.0, 4.0, 4.0)),
@@ -84,7 +76,7 @@ class TestSelectDetections(unittest.TestCase):
     def test_when_rows_selected_then_returns_only_those_in_original_order(self):
         # Arrange
         detections = _three_detections()
-        selected_rows = [2, 0]  # out of order on purpose
+        selected_rows = [2, 0]
         expected = [detections[0], detections[2]]
 
         # Act
@@ -96,7 +88,7 @@ class TestSelectDetections(unittest.TestCase):
     def test_when_selection_index_out_of_range_then_it_is_ignored(self):
         # Arrange
         detections = _three_detections()
-        selected_rows = [1, 99]  # 99 is a stale index from a previous image
+        selected_rows = [1, 99]
         expected = [detections[1]]
 
         # Act

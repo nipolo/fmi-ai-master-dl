@@ -1,11 +1,4 @@
-"""Plot the two LR schedules required by the assignment (Requirement 5).
-
-Produces reports/figures/lr_schedules.png comparing cosine annealing and step
-decay over the same number of epochs. Needs no data or training — it samples
-the schedulers directly.
-
-Usage:  uv run python -m objdetect.cli.figures.plot_lr_schedules --epochs 12
-"""
+"""Plot the two LR schedules required by the assignment (Requirement 5)."""
 
 import argparse
 

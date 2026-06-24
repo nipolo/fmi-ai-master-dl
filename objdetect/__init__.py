@@ -1,19 +1,4 @@
-"""Object detection on everyday-context images (COCO).
-
-University Deep Learning course project — Topic 4.
-
-The package is organised by responsibility:
-
-- ``data``       — COCO download and dataset wrappers.
-- ``eda``        — exploratory data analysis and the EDA report generator.
-- ``models``     — Faster R-CNN (two-stage) and YOLO (one-stage) wrappers
-                   behind one common ``predict`` interface.
-- ``training``   — fine-tuning loop and learning-rate schedulers
-                   (cosine annealing, step decay).
-- ``evaluation`` — COCO-style mAP metrics.
-- ``app``        — Streamlit web application.
-- ``cli``        — command-line entry points (``python -m objdetect.cli.<group>.<name>``).
-"""
+"""Object detection on everyday-context images (COCO)."""
 
 __version__ = "0.1.0"
 

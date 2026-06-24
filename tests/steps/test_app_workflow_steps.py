@@ -1,10 +1,4 @@
-"""Step definitions binding the app_workflow.feature scenarios (BDD).
-
-These cover the remaining app-facing behaviours beyond thresholding: picking a
-model from the UI dropdown, tabulating detections for display, and summarizing
-detections per class. As with the detection steps, no model weights are needed
--- the model-selection scenario only exercises the offline error path.
-"""
+"""Step definitions binding the app_workflow.feature scenarios (BDD)."""
 
 import pytest
 from pytest_bdd import given, parsers, scenarios, then, when
@@ -17,13 +11,11 @@ from objdetect.app.inference import (
 )
 from objdetect.models.base import Detection
 
-# Bind every scenario in the feature file.
 scenarios("../features/app_workflow.feature")
 
 
 @pytest.fixture
 def context() -> dict:
-    """Mutable bag carrying state between Given/When/Then steps."""
     return {}
 
 

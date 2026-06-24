@@ -16,11 +16,7 @@ __all__ = [
 
 
 def build_detector(kind: str, **kwargs) -> Detector:
-    """Factory: ``kind`` is 'faster_rcnn', 'yolo' or 'ensemble'.
-
-    For 'ensemble', ``members`` is a list of ``(kind, kwargs)`` specs that are
-    built recursively and run together (see ``EnsembleDetector``).
-    """
+    """Factory: ``kind`` is 'faster_rcnn', 'yolo' or 'ensemble'."""
     if kind == "ensemble":
         members = [build_detector(k, **kw) for k, kw in kwargs.pop("members")]
         return EnsembleDetector(members, **kwargs)

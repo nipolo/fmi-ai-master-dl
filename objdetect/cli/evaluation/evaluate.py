@@ -1,9 +1,4 @@
-"""Evaluate a detector's COCO mAP on the class subset.
-
-Usage:
-  uv run python -m objdetect.cli.evaluation.evaluate --weights DATA/checkpoints/faster_rcnn_cosine.pth
-  uv run python -m objdetect.cli.evaluation.evaluate            # pretrained baseline
-"""
+"""Evaluate a detector's COCO mAP on the class subset."""
 
 import argparse
 import json
@@ -30,7 +25,6 @@ def main() -> int:
             device=args.device,
         )
     else:
-        # Pretrained 80-class model evaluated on the subset categories.
         detector = build_detector("faster_rcnn", device=args.device)
 
     metrics = evaluate_coco_map(

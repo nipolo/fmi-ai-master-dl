@@ -1,8 +1,4 @@
-"""Unit tests for the EDA utilities
-
-A tiny fake COCO object provides three annotations so
-the analysis functions can be checked without downloading the dataset.
-"""
+"""Unit tests for the EDA utilities."""
 
 import unittest
 
@@ -10,8 +6,6 @@ from objdetect import eda
 
 
 class _FakeCoco:
-    """Minimal stand-in exposing the pycocotools methods eda.py calls."""
-
     def __init__(self):
         self._cats = {
             1: {"id": 1, "name": "person", "supercategory": "person"},
@@ -111,7 +105,6 @@ class TestFindAnomalies(unittest.TestCase):
         flagged_types = set(anomalies["anomaly"])
 
         # Assert
-        # The 2x2 box is tiny; the 199x5 box is both extreme-aspect and crowd.
         self.assertIn("tiny", flagged_types)
         self.assertIn("crowd", flagged_types)
         self.assertIn("extreme_aspect", flagged_types)

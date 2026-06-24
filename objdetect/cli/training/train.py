@@ -1,12 +1,4 @@
-"""Fine-tune Faster R-CNN on the COCO class subset.
-
-Usage:
-  uv run python -m objdetect.cli.training.train --scheduler cosine --epochs 6
-  uv run python -m objdetect.cli.training.train --scheduler step   --epochs 6 --max-batches 20
-
-``--max-batches`` caps batches per epoch for a quick local smoke run; omit it
-for a full run over the whole subset.
-"""
+"""Fine-tune Faster R-CNN on the COCO class subset."""
 
 import argparse
 import json

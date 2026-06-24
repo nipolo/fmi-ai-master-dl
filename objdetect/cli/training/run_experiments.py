@@ -1,17 +1,4 @@
-"""Run the experiments that fill the model report (Reqs. 3-5).
-
-For each LR schedule (cosine, step) this:
-  1. fine-tunes Faster R-CNN on the COCO subset,
-  2. records the per-epoch LR and loss history,
-  3. evaluates mAP on the subset,
-and then writes a combined loss/LR comparison figure plus a metrics JSON.
-
-Defaults are sized for a quick CPU/MPS smoke run (small --max-batches). For a
-heavier run, raise --epochs and drop --max-batches.
-
-Usage:
-  uv run python -m objdetect.cli.training.run_experiments --epochs 6 --max-batches 15
-"""
+"""Run the LR-schedule experiments that fill the model report."""
 
 import argparse
 import json
@@ -70,7 +57,6 @@ def main() -> int:
         }
         print(f"{schedule}: mAP={metrics['mAP']:.3f}  final_loss={history.train_loss[-1]:.3f}")
 
-    # Comparison figure: loss vs epoch and LR vs epoch for both schedules.
     config.FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     fig, (ax_loss, ax_lr) = plt.subplots(1, 2, figsize=(13, 5))
     for schedule, hist in histories.items():

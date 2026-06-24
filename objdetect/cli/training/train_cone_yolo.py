@@ -1,23 +1,4 @@
-"""Fine-tune YOLO26n on the traffic-cone dataset (Req. 4 deep dive).
-
-A thin wrapper over the Ultralytics trainer so the YOLO cone experiment is
-reproducible the same way as the Faster R-CNN one (cli.training.train_cone_frcnn): same
-CLI shape, and it copies its training curve + metrics into reports/ so the model
-report stays in sync instead of relying on a hand-copy from DATA/runs/.
-
-Prerequisite (run once): clone + lay out the dataset
-    git clone --depth 1 https://github.com/krisstern/traffic-cone-image-dataset.git DATA/_cone_src
-    uv run python -m objdetect.cli.data.prepare_cone_dataset
-
-Run the fine-tune:
-    uv run python -m objdetect.cli.training.train_cone_yolo --epochs 100 --device mps
-    uv run python -m objdetect.cli.training.train_cone_yolo --epochs 5 --device cpu   # quick smoke
-
-Writes reports/figures/cone_yolo_training_<epochs>ep.png +
-reports/cone_yolo_results_<epochs>ep.json (suffixed by epoch budget, so runs at
-different budgets don't overwrite each other). Publish weights for the app:
-    cp DATA/runs/cone_yolo26n/weights/best.pt DATA/weights/cone_yolo26n.pt
-"""
+"""Fine-tune YOLO26n on the traffic-cone dataset."""
 
 import argparse
 import json
@@ -29,11 +10,6 @@ from objdetect import config
 
 
 def _write_report_artifacts(run_dir, metrics, epochs) -> None:
-    """Copy the training curve and write a metrics JSON into reports/.
-
-    Filenames are suffixed with the epoch budget (e.g. ``_20ep``) so runs at
-    different budgets don't overwrite each other's artifacts.
-    """
     config.FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     suffix = f"_{epochs}ep"
     shutil.copy2(run_dir / "results.png", config.FIGURES_DIR / f"cone_yolo_training{suffix}.png")

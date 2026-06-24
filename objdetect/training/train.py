@@ -1,9 +1,4 @@
-"""Fine-tuning loop for the torchvision Faster R-CNN detector.
-
-Kept deliberately small and explicit so it is presentable: one epoch loop,
-one optimizer, one scheduler, per-epoch LR and loss recorded into a history
-that the report and the LR-schedule plots consume.
-"""
+"""Fine-tuning loop for the torchvision Faster R-CNN detector."""
 
 from dataclasses import dataclass, field
 
@@ -29,12 +24,7 @@ def train_one_epoch(
     device: torch.device,
     max_batches: int | None = None,
 ) -> float:
-    """Run one training epoch and return the mean total loss.
-
-    torchvision detection models return a dict of losses when called in train
-    mode with targets; we sum them, as is standard for Faster R-CNN.
-    ``max_batches`` caps the epoch for quick local smoke runs.
-    """
+    """Run one training epoch and return the mean total loss."""
     model.train()
     running, seen = 0.0, 0
     for batch_index, (images, targets) in enumerate(loader):
@@ -68,12 +58,7 @@ def fine_tune(
     max_batches: int | None = None,
     seed: int = 42,
 ) -> TrainHistory:
-    """Fine-tune ``model`` and return the training history.
-
-    The optimizer is SGD with momentum (the torchvision detection default);
-    ``scheduler_name`` selects 'cosine' or 'step', which is the knob the
-    LR-schedule experiment varies while holding everything else fixed.
-    """
+    """Fine-tune ``model`` and return the training history."""
     seed_everything(seed)
     device = resolve_device(device)
     model.to(device)

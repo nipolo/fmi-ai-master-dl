@@ -1,9 +1,4 @@
-"""Step definitions binding the object_detection.feature scenarios (BDD).
-
-Uses pytest-bdd. The Given/When/Then steps drive the same app-facing
-inference helpers the Streamlit UI calls, with a FakeDetector standing in for
-the neural network so the behaviour is verified without model weights.
-"""
+"""Step definitions binding the object_detection.feature scenarios (BDD)."""
 
 import numpy as np
 import pytest
@@ -14,13 +9,11 @@ from objdetect.app.inference import run_detection
 from objdetect.models.base import Detection
 from tests.conftest import FakeDetector
 
-# Bind every scenario in the feature file.
 scenarios("../features/object_detection.feature")
 
 
 @pytest.fixture
 def context() -> dict:
-    """Mutable bag carrying state between Given/When/Then steps."""
     return {}
 
 

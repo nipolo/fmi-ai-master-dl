@@ -1,18 +1,4 @@
-"""Prepare the traffic-cone dataset for YOLO fine-tuning.
-
-Source: https://github.com/krisstern/traffic-cone-image-dataset (single class,
-263 images, YOLO-format labels, no known copyright). It ships a train-only
-split whose yaml points ``train`` and ``val`` at the *same* folder, which would
-report dishonest (train-on-val) metrics. This script instead lays the data out
-in the standard Ultralytics structure with a reproducible, seeded 80/20 split:
-
-    DATA/traffic_cone/
-      images/{train,val}/*.jpg
-      labels/{train,val}/*.txt
-      traffic_cone.yaml          <- generated data config (consumed by YOLO)
-
-Run once before training:  uv run python -m objdetect.cli.data.prepare_cone_dataset
-"""
+"""Prepare the traffic-cone dataset for YOLO fine-tuning."""
 
 import random
 import shutil
@@ -36,7 +22,6 @@ def main() -> int:
             f"{config.DATA_DIR / '_cone_src'}"
         )
 
-    # Pair each image with its label by filename stem; skip any unlabeled image.
     pairs = []
     for image_path in sorted(src_images.iterdir()):
         if image_path.suffix.lower() not in {".jpg", ".jpeg", ".png"}:
@@ -45,7 +30,6 @@ def main() -> int:
         if label_path.is_file():
             pairs.append((image_path, label_path))
 
-    # Seeded shuffle so the split is identical on every machine and every run.
     random.seed(config.SEED)
     random.shuffle(pairs)
     val_count = round(len(pairs) * VAL_FRACTION)

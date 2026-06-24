@@ -1,9 +1,4 @@
-"""Faster R-CNN detector (two-stage) built on torchvision.
-
-Faster R-CNN first proposes candidate regions with a Region Proposal Network,
-then classifies and refines each one. It is the accurate-but-slower half of
-the project's accuracy/speed comparison against YOLO.
-"""
+"""Faster R-CNN detector (two-stage) built on torchvision."""
 
 import torch
 from PIL.Image import Image
@@ -19,13 +14,7 @@ from objdetect.utils import resolve_device
 
 
 class FasterRCNNDetector:
-    """torchvision Faster R-CNN with a ResNet-50 FPN backbone.
-
-    By default it loads weights pretrained on the full 80-class COCO set, so
-    the app works without any training. Passing ``num_classes`` swaps the
-    classification head for fine-tuning on the project's class subset; the
-    matching class names must then be supplied via :meth:`set_class_names`.
-    """
+    """torchvision Faster R-CNN with a ResNet-50 FPN backbone."""
 
     name = "Faster R-CNN"
 
@@ -39,13 +28,10 @@ class FasterRCNNDetector:
         self.device = resolve_device(device)
 
         if num_classes is None:
-            # Pretrained 80-class COCO model — used as-is by the app.
             self.weights = FasterRCNN_ResNet50_FPN_Weights.DEFAULT
             self.model = fasterrcnn_resnet50_fpn(weights=self.weights)
             self.class_names = list(self.weights.meta["categories"])
         else:
-            # Fine-tuning setup: COCO-pretrained backbone, fresh head sized to
-            # num_classes + 1 (the extra slot is the background class).
             self.weights = None
             self.model = fasterrcnn_resnet50_fpn(
                 weights=FasterRCNN_ResNet50_FPN_Weights.DEFAULT
@@ -70,11 +56,7 @@ class FasterRCNNDetector:
         self.model.eval()
 
     def set_class_names(self, names: list[str]) -> None:
-        """Provide readable names for a fine-tuned model (index = label id).
-
-        ``names`` lists the foreground classes in label order (label 1 first);
-        background is inserted automatically at index 0.
-        """
+        """Provide readable names for a fine-tuned model (index = label id)."""
         self.class_names = ["__background__"] + list(names)
 
     @torch.no_grad()

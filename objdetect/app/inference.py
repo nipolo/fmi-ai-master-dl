@@ -13,8 +13,6 @@ CONE_WEIGHTS = config.CONE_WEIGHTS
 CONE_WEIGHTS_20EP = config.CONE_WEIGHTS_20EP
 CONE_FRCNN_WEIGHTS = config.CONE_FRCNN_WEIGHTS
 
-# Friendly label -> (builder, kwargs). The cone model only detects its one class,
-# so it ships only via the combined "+ Cones" entries (one per detector family).
 AVAILABLE_MODELS = {
     "Faster R-CNN (two-stage)": ("faster_rcnn", {}),
     "Faster R-CNN + Cones (81 classes)": (
@@ -59,7 +57,6 @@ AVAILABLE_MODELS = {
 
 
 def _missing_weights(builder_name: str, kwargs: dict) -> str | None:
-    """First referenced weights file that is absent (recursing into ensembles), else None."""
     if builder_name == "ensemble":
         for member_name, member_kwargs in kwargs.get("members", []):
             missing = _missing_weights(member_name, member_kwargs)
@@ -118,14 +115,7 @@ def detections_to_frame(detections: list[Detection]) -> pd.DataFrame:
 def select_detections(
     detections: list[Detection], selected_rows: list[int]
 ) -> list[Detection]:
-    """Pick the detections to draw given the table rows the user selected.
-
-    ``selected_rows`` holds positional indices into ``detections`` (the table
-    shares its order). When nothing is selected the user has not filtered, so
-    every detection is returned; otherwise only the chosen rows are kept, in
-    the order ``detections`` already has. Out-of-range indices are ignored so a
-    stale selection from a previous image can never raise.
-    """
+    """Pick the detections to draw given the table rows the user selected."""
     if not selected_rows:
         return detections
     chosen = set(selected_rows)

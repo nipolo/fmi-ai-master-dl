@@ -1,20 +1,4 @@
-"""Learning-rate schedulers required by the assignment.
-
-Requirement 5 asks us to demonstrate changing the learning rate as epochs
-increase, specifically:
-
-- **step decay** (:class:`torch.optim.lr_scheduler.StepLR`): the LR is held
-  constant, then multiplied by ``gamma`` every ``step_size`` epochs — a
-  piecewise-constant staircase,
-- **cosine annealing**
-  (:class:`torch.optim.lr_scheduler.CosineAnnealingLR`): the LR follows a
-  half cosine from the initial value down to ``eta_min`` over ``T_max``
-  epochs — a smooth decay that spends longer at high and low extremes.
-
-Both are thin wrappers so the training script and the report use identical
-configuration, and :func:`sample_lr_curve` lets us plot the schedules without
-running a real training.
-"""
+"""Learning-rate schedulers: step decay and cosine annealing."""
 
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import (
@@ -46,12 +30,7 @@ def sample_lr_curve(
     base_lr: float = 0.005,
     **kwargs,
 ) -> list[float]:
-    """Return the LR at each epoch for ``name``, for plotting/inspection.
-
-    Builds a throwaway optimizer over a single dummy parameter and steps the
-    scheduler ``epochs`` times, recording the LR before each step. No model or
-    data is needed, which makes the schedule curves trivially testable.
-    """
+    """Return the LR at each epoch for ``name``, for plotting/inspection."""
     import torch
 
     dummy = torch.nn.Parameter(torch.zeros(1))

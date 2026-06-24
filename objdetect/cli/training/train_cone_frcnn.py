@@ -1,33 +1,4 @@
-"""Fine-tune Faster R-CNN on the traffic-cone dataset (Req. 3 deep dive).
-
-This mirrors the YOLO cone experiment (§7 of the model report) for the
-*two-stage* detector: it fine-tunes Faster R-CNN on the same seeded 80/20 cone
-split, then evaluates COCO mAP on the held-out val images — giving a real,
-converged two-stage-vs-one-stage comparison on a custom out-of-COCO class.
-
-Unlike a COCO-subset fine-tune, this earns its compute: the cone class is a
-genuine domain shift, so training actually helps.
-
-Prerequisite (run once):
-    uv run python -m objdetect.cli.data.prepare_cone_coco      # YOLO -> COCO labels
-
-Run the fine-tune (this is the training step — sized for your machine):
-    # Safe everywhere (CPU): slower but never exhausts GPU memory.
-    uv run python -m objdetect.cli.training.train_cone_frcnn --device cpu --epochs 15
-
-    # Faster on Apple Silicon (MPS). Faster R-CNN training is memory-heavy, so
-    # this defaults to batch 1 and a 512 px input. If MPS still over-commits the
-    # 16 GB unified memory and the machine swaps, cap it so it errors instead:
-    #   PYTORCH_MPS_HIGH_WATERMARK_RATIO=1.0 uv run python -m objdetect.cli.training.train_cone_frcnn --epochs 20
-    # ...and if it still OOMs, fall back to --device cpu.
-
-    # Quick smoke to confirm it runs at all (a few batches):
-    uv run python -m objdetect.cli.training.train_cone_frcnn --device cpu --epochs 1 --max-batches 5
-
-Writes weights to DATA/checkpoints/ and results.json + training.png to reports/.
-To use the result in the app, publish the weights to the path it loads:
-    cp DATA/checkpoints/faster_rcnn_cone_cosine.pth DATA/weights/faster_rcnn_cone.pth
-"""
+"""Fine-tune Faster R-CNN on the traffic-cone dataset."""
 
 import argparse
 import json
@@ -45,7 +16,6 @@ from objdetect.training.train import fine_tune
 
 
 def _plot_training(history, scheduler: str, out_path) -> None:
-    """Save a loss-vs-epoch / LR-vs-epoch figure for the report."""
     epochs = range(1, len(history.train_loss) + 1)
     fig, ax_loss = plt.subplots(figsize=(8, 5))
     ax_loss.plot(
@@ -113,8 +83,6 @@ def main() -> int:
     )
 
     detector = build_detector("faster_rcnn", num_classes=len(config.CONE_CLASS_NAMES))
-    # Shrink the model's internal resize to cut activation memory (the cone
-    # images are <=1024 px and the class is large/distinct, so 512 is ample).
     detector.model.transform.min_size = (args.min_size,)
     detector.model.transform.max_size = args.max_size
 
@@ -136,7 +104,6 @@ def main() -> int:
     )
     print("val metrics:", json.dumps(metrics, indent=2))
 
-    # Persist weights (checkpoints), a results record + training curve (reports).
     config.CHECKPOINTS_DIR.mkdir(parents=True, exist_ok=True)
     config.FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     weights_path = config.CHECKPOINTS_DIR / f"faster_rcnn_cone_{args.scheduler}.pth"

@@ -1,8 +1,4 @@
-"""YOLO detector (one-stage) built on Ultralytics.
-
-YOLO predicts boxes and classes in a single forward pass over a grid, which
-makes it far faster than Faster R-CNN — the speed half of the comparison.
-"""
+"""YOLO detector (one-stage) built on Ultralytics."""
 
 from PIL.Image import Image
 
@@ -11,11 +7,7 @@ from objdetect.utils import resolve_device
 
 
 class YOLODetector:
-    """Ultralytics YOLO wrapped to the project's common detector interface.
-
-    ``weights`` accepts an Ultralytics model name (e.g. ``"yolo26n.pt"``,
-    downloaded on first use) or a path to a fine-tuned checkpoint.
-    """
+    """Ultralytics YOLO wrapped to the project's common detector interface."""
 
     name = "YOLO"
 
@@ -24,8 +16,6 @@ class YOLODetector:
         weights: str = "yolo26n.pt",
         device: str | None = None,
     ) -> None:
-        # Imported lazily so the rest of the package (and its tests) does not
-        # pay Ultralytics' heavy import cost unless YOLO is actually used.
         from ultralytics import YOLO
 
         self.device = str(resolve_device(device))

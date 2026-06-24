@@ -26,7 +26,6 @@ class TestSampleLrCurveStep(unittest.TestCase):
         self.assertEqual(actual_length, expected_length)
         self.assertAlmostEqual(lrs[0], expected_first)
         self.assertAlmostEqual(lrs[3], expected_after_one_step)
-        # Staircase: constant within each block of step_size epochs.
         self.assertAlmostEqual(lrs[0], lrs[1])
         self.assertAlmostEqual(lrs[1], lrs[2])
 

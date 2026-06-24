@@ -1,14 +1,4 @@
-"""Benchmark the pretrained Faster R-CNN and YOLO baselines (Reqs. 3-4).
-
-Measures, on the same COCO subset, for each model:
-  - mAP@[.50:.95], mAP@.50 (via the shared detector evaluator),
-  - inference speed (images/second),
-  - parameter count.
-Writes reports/baseline_results.json, which the model report quotes.
-
-Usage:
-  uv run python -m objdetect.cli.evaluation.benchmark_baselines --max-images 200
-"""
+"""Benchmark the pretrained Faster R-CNN and YOLO baselines (Reqs. 3-4)."""
 
 import argparse
 import json
@@ -32,13 +22,12 @@ def _count_params(detector) -> int:
 
 
 def _measure_fps(detector, dataset, num_images: int) -> float:
-    """Average images/second over the first ``num_images`` (after a warm-up)."""
     paths = [
         dataset.images_dir / dataset.coco.loadImgs([dataset.image_ids[i]])[0]["file_name"]
         for i in range(min(num_images, len(dataset)))
     ]
     images = [Image.open(p).convert("RGB") for p in paths]
-    detector.predict(images[0], score_threshold=0.5)  # warm-up (lazy CUDA/MPS init)
+    detector.predict(images[0], score_threshold=0.5)
 
     start = time.time()
     for image in images:

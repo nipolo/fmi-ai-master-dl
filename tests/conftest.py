@@ -1,17 +1,9 @@
-"""Shared lightweight test doubles.
-
-These let the whole suite run fast and offline: no model weights are
-downloaded and no COCO images are needed. A ``FakeDetector`` stands in for the
-real Faster R-CNN / YOLO wrappers wherever a test only cares about the
-detection plumbing, not the neural network itself.
-"""
+"""Shared lightweight test doubles."""
 
 from objdetect.models.base import Detection
 
 
 class FakeDetector:
-    """A detector returning canned detections, filtered by score threshold."""
-
     name = "Fake"
 
     def __init__(self, detections: list[Detection] | None = None) -> None:
