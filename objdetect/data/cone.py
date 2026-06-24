@@ -1,7 +1,7 @@
 """Traffic-cone dataset in torchvision-detection format, for Faster R-CNN.
 
 Reuses :class:`~data.coco.CocoSubsetDataset` over the COCO-format cone
-annotations emitted by ``cli.prepare_cone_coco``, so the two-stage detector
+annotations emitted by ``cli.data.prepare_cone_coco``, so the two-stage detector
 trains and is evaluated through exactly the same pipeline as the COCO subset
 (same target format, same ``evaluate_coco_map``).
 """
@@ -21,7 +21,7 @@ def cone_dataset(split: str, train: bool) -> CocoSubsetDataset:
     if not annotations_file.is_file():
         raise SystemExit(
             f"cone COCO annotations not found at {annotations_file}; run "
-            "`uv run python -m objdetect.cli.prepare_cone_coco` first"
+            "`uv run python -m objdetect.cli.data.prepare_cone_coco` first"
         )
     coco = COCO(str(annotations_file))
     return CocoSubsetDataset(

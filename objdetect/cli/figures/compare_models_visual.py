@@ -5,8 +5,8 @@ accuracy/recall difference is visible at a glance. Defaults to the committed
 demo photo so the presentation slide reproduces without the COCO dataset.
 
 Usage:
-  uv run python -m objdetect.cli.compare_models_visual
-  uv run python -m objdetect.cli.compare_models_visual --image reports/figures/photo-to-compare-models.JPG
+  uv run python -m objdetect.cli.figures.compare_models_visual
+  uv run python -m objdetect.cli.figures.compare_models_visual --image reports/figures/photo-to-compare-models.JPG
 """
 
 import argparse

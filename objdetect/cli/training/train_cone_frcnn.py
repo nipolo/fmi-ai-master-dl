@@ -9,20 +9,20 @@ Unlike a COCO-subset fine-tune, this earns its compute: the cone class is a
 genuine domain shift, so training actually helps.
 
 Prerequisite (run once):
-    uv run python -m objdetect.cli.prepare_cone_coco      # YOLO -> COCO labels
+    uv run python -m objdetect.cli.data.prepare_cone_coco      # YOLO -> COCO labels
 
 Run the fine-tune (this is the training step — sized for your machine):
     # Safe everywhere (CPU): slower but never exhausts GPU memory.
-    uv run python -m objdetect.cli.train_cone_frcnn --device cpu --epochs 15
+    uv run python -m objdetect.cli.training.train_cone_frcnn --device cpu --epochs 15
 
     # Faster on Apple Silicon (MPS). Faster R-CNN training is memory-heavy, so
     # this defaults to batch 1 and a 512 px input. If MPS still over-commits the
     # 16 GB unified memory and the machine swaps, cap it so it errors instead:
-    #   PYTORCH_MPS_HIGH_WATERMARK_RATIO=1.0 uv run python -m objdetect.cli.train_cone_frcnn --epochs 20
+    #   PYTORCH_MPS_HIGH_WATERMARK_RATIO=1.0 uv run python -m objdetect.cli.training.train_cone_frcnn --epochs 20
     # ...and if it still OOMs, fall back to --device cpu.
 
     # Quick smoke to confirm it runs at all (a few batches):
-    uv run python -m objdetect.cli.train_cone_frcnn --device cpu --epochs 1 --max-batches 5
+    uv run python -m objdetect.cli.training.train_cone_frcnn --device cpu --epochs 1 --max-batches 5
 
 Writes weights to DATA/checkpoints/ and results.json + training.png to reports/.
 To use the result in the app, publish the weights to the path it loads:

@@ -39,7 +39,7 @@ Additional success criteria (user's own):
 ## Project layout
 
 Flat layout: the importable `objdetect` package lives at the repo root (no
-`src/` wrapper). Run command-line modules with `python -m objdetect.cli.<name>`.
+`src/` wrapper). Run command-line modules with `python -m objdetect.cli.<group>.<name>`.
 
 ```
 objdetect/            # the importable package (lives at repo root, not under src/)
@@ -52,10 +52,12 @@ objdetect/            # the importable package (lives at repo root, not under sr
   training/           # train loop, LR schedulers (cosine annealing, step decay)
   evaluation/         # mAP / COCO metrics
   app/                # Streamlit application
-  cli/                # entry points, run via `python -m objdetect.cli.<name>`:
-                      #   download_data, prepare_cone_dataset, train,
-                      #   run_experiments, evaluate, benchmark_baselines,
-                      #   plot_lr_schedules, compare_models_visual
+  cli/                # entry points, grouped by purpose, run via
+                      # `python -m objdetect.cli.<group>.<name>`:
+                      #   data/       — download_data, prepare_cone_dataset, prepare_cone_coco
+                      #   training/   — train, train_cone_frcnn, train_cone_yolo, run_experiments
+                      #   evaluation/ — evaluate, benchmark_baselines
+                      #   figures/    — plot_lr_schedules, compare_models_visual
 research/             # Req. 1-2: LITERATURE_REVIEW.md, EDA_REPORT.md, 01_eda.ipynb, figures/
 tests/
   features/           # Gherkin .feature files (BDD)
@@ -97,4 +99,4 @@ Documentation/        # requirements PDF, project & learning plans
 - `uv sync` — install environment.
 - `uv run pytest` — run all tests (BDD + unit).
 - `uv run streamlit run objdetect/app/main.py` — launch the app.
-- `uv run python -m objdetect.cli.train --model faster_rcnn|yolo --scheduler cosine|step` — training entry point.
+- `uv run python -m objdetect.cli.training.train --model faster_rcnn|yolo --scheduler cosine|step` — training entry point.

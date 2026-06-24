@@ -22,7 +22,7 @@ A web application that detects objects in everyday photos, backed by experiments
 | Path                     | What it is                                                             |
 | ------------------------ | ---------------------------------------------------------------------- |
 | `objdetect/`                   | the package: `data`, `eda`, `models`, `training`, `evaluation`, `app`, `cli` (+ `config.py`) |
-| `objdetect/cli/`               | one-command entry points, run via `python -m objdetect.cli.<name>` (download, train, evaluate, benchmark) |
+| `objdetect/cli/`               | one-command entry points grouped by purpose, run via `python -m objdetect.cli.<group>.<name>` (data, training, evaluation, figures) |
 | `research/`              | Req. 1–2: literature review, EDA report + `01_eda.ipynb`, figures      |
 | `tests/`                 | `unittest` + `pytest-bdd` BDD tests                     |
 | `reports/`               | **model report**, presentation, experiment results + figures          |
@@ -55,15 +55,15 @@ Select the `.venv` interpreter as the Jupyter kernel.
 
 ```bash
 # Data
-uv run python -m objdetect.cli.download_data        # fetch COCO val2017 (~780 MB)
+uv run python -m objdetect.cli.data.download_data        # fetch COCO val2017 (~780 MB)
 uv run python -m objdetect.eda.report    # EDA figures + summary
 
 # Models / experiments
-uv run python -m objdetect.cli.benchmark_baselines --max-images 200   # mAP/FPS/size
-uv run python -m objdetect.cli.train --scheduler cosine --epochs 6    # fine-tune
-uv run python -m objdetect.cli.run_experiments                        # cosine vs step
-uv run python -m objdetect.cli.plot_lr_schedules                      # LR curves figure
-uv run python -m objdetect.cli.compare_models_visual                  # side-by-side image
+uv run python -m objdetect.cli.evaluation.benchmark_baselines --max-images 200   # mAP/FPS/size
+uv run python -m objdetect.cli.training.train --scheduler cosine --epochs 6    # fine-tune
+uv run python -m objdetect.cli.training.run_experiments                        # cosine vs step
+uv run python -m objdetect.cli.figures.plot_lr_schedules                      # LR curves figure
+uv run python -m objdetect.cli.figures.compare_models_visual                  # side-by-side image
 
 # App
 uv run streamlit run objdetect/app/main.py
@@ -71,7 +71,7 @@ uv run streamlit run objdetect/app/main.py
 
 On first run each model downloads its pretrained weights automatically (YOLO via ultralytics, Faster R-CNN via torchvision) — needs internet once; cached afterwards. Only the data and EDA/training/benchmark commands need the COCO dataset (`download_data.py`); the app runs on uploaded photos without it.
 
-The **Faster R-CNN + Cones** app option needs the fine-tuned cone weights (~165 MB, not committed). Either train them (`uv run python -m objdetect.cli.train_cone_frcnn --device cpu --epochs 20`) or [download `faster_rcnn_cone.pth`](https://drive.google.com/file/d/1DKT2E__iErPYJHZxSdWXMG_TYYIIJO9c/view) into `DATA/weights/`.
+The **Faster R-CNN + Cones** app option needs the fine-tuned cone weights (~165 MB, not committed). Either train them (`uv run python -m objdetect.cli.training.train_cone_frcnn --device cpu --epochs 20`) or [download `faster_rcnn_cone.pth`](https://drive.google.com/file/d/1DKT2E__iErPYJHZxSdWXMG_TYYIIJO9c/view) into `DATA/weights/`.
 
 ## VS Code
 
@@ -91,5 +91,5 @@ Pre-configured tasks and debug profiles live in `.vscode/`.
 | Configuration                   | What it debugs                        |
 | ------------------------------- | ------------------------------------- |
 | Debug current Python file       | the file open in the editor           |
-| Debug script: objdetect.cli.train (cosine) | `objdetect.cli.train` with example args  |
+| Debug script: objdetect.cli.training.train (cosine) | `objdetect.cli.training.train` with example args  |
 | Debug Streamlit app             | the Streamlit app, breakpoints active |

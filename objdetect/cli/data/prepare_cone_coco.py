@@ -1,6 +1,6 @@
 """Convert the YOLO-format traffic-cone dataset to COCO-format annotations.
 
-The cone dataset (laid out by ``cli.prepare_cone_dataset``) stores labels in
+The cone dataset (laid out by ``cli.data.prepare_cone_dataset``) stores labels in
 YOLO format — one ``*.txt`` per image, each line ``cls cx cy w h`` normalised to
 the image size. Faster R-CNN in this project reads COCO-style annotations
 (``CocoSubsetDataset`` over a ``pycocotools`` API), so to fine-tune Faster R-CNN
@@ -11,9 +11,9 @@ JSON files:
     DATA/traffic_cone/annotations/instances_val.json
 
 This is data prep, not training — run it once before
-``cli.train_cone_frcnn``:
+``cli.training.train_cone_frcnn``:
 
-    uv run python -m objdetect.cli.prepare_cone_coco
+    uv run python -m objdetect.cli.data.prepare_cone_coco
 """
 
 import json
@@ -52,7 +52,7 @@ def _build_split(split: str) -> dict:
     if not images_dir.is_dir():
         raise SystemExit(
             f"cone images not found at {images_dir}; run "
-            "`uv run python -m objdetect.cli.prepare_cone_dataset` first"
+            "`uv run python -m objdetect.cli.data.prepare_cone_dataset` first"
         )
 
     # Single class; COCO category ids are 1-based (0 is background for the model).

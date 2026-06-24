@@ -84,7 +84,7 @@ def load_model(display_name: str) -> Detector:
             "The cone Faster R-CNN weights (~165 MB) are not committed. Either\n"
             f"download them to {missing} from\n"
             "https://drive.google.com/file/d/1DKT2E__iErPYJHZxSdWXMG_TYYIIJO9c/view\n"
-            "or train them: uv run python -m objdetect.cli.train_cone_frcnn --device cpu --epochs 20"
+            "or train them: uv run python -m objdetect.cli.training.train_cone_frcnn --device cpu --epochs 20"
         )
     return build_detector(builder_name, **kwargs)
 

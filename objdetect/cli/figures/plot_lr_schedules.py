@@ -4,7 +4,7 @@ Produces reports/figures/lr_schedules.png comparing cosine annealing and step
 decay over the same number of epochs. Needs no data or training — it samples
 the schedulers directly.
 
-Usage:  uv run python -m objdetect.cli.plot_lr_schedules --epochs 12
+Usage:  uv run python -m objdetect.cli.figures.plot_lr_schedules --epochs 12
 """
 
 import argparse

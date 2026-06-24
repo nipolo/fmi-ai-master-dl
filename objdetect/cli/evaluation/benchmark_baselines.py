@@ -7,7 +7,7 @@ Measures, on the same COCO subset, for each model:
 Writes reports/baseline_results.json, which the model report quotes.
 
 Usage:
-  uv run python -m objdetect.cli.benchmark_baselines --max-images 200
+  uv run python -m objdetect.cli.evaluation.benchmark_baselines --max-images 200
 """
 
 import argparse

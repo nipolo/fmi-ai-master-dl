@@ -1,8 +1,8 @@
 """Evaluate a detector's COCO mAP on the class subset.
 
 Usage:
-  uv run python -m objdetect.cli.evaluate --weights DATA/checkpoints/faster_rcnn_cosine.pth
-  uv run python -m objdetect.cli.evaluate            # pretrained baseline
+  uv run python -m objdetect.cli.evaluation.evaluate --weights DATA/checkpoints/faster_rcnn_cosine.pth
+  uv run python -m objdetect.cli.evaluation.evaluate            # pretrained baseline
 """
 
 import argparse

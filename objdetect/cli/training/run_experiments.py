@@ -10,7 +10,7 @@ Defaults are sized for a quick CPU/MPS smoke run (small --max-batches). For a
 heavier run, raise --epochs and drop --max-batches.
 
 Usage:
-  uv run python -m objdetect.cli.run_experiments --epochs 6 --max-batches 15
+  uv run python -m objdetect.cli.training.run_experiments --epochs 6 --max-batches 15
 """
 
 import argparse

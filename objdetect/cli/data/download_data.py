@@ -1,6 +1,6 @@
 """Download COCO val2017 images and annotations into DATA/coco/.
 
-Usage:  uv run python -m objdetect.cli.download_data [--force]
+Usage:  uv run python -m objdetect.cli.data.download_data [--force]
 """
 
 import argparse

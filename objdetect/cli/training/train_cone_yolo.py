@@ -1,17 +1,17 @@
 """Fine-tune YOLO26n on the traffic-cone dataset (Req. 4 deep dive).
 
 A thin wrapper over the Ultralytics trainer so the YOLO cone experiment is
-reproducible the same way as the Faster R-CNN one (cli.train_cone_frcnn): same
+reproducible the same way as the Faster R-CNN one (cli.training.train_cone_frcnn): same
 CLI shape, and it copies its training curve + metrics into reports/ so the model
 report stays in sync instead of relying on a hand-copy from DATA/runs/.
 
 Prerequisite (run once): clone + lay out the dataset
     git clone --depth 1 https://github.com/krisstern/traffic-cone-image-dataset.git DATA/_cone_src
-    uv run python -m objdetect.cli.prepare_cone_dataset
+    uv run python -m objdetect.cli.data.prepare_cone_dataset
 
 Run the fine-tune:
-    uv run python -m objdetect.cli.train_cone_yolo --epochs 100 --device mps
-    uv run python -m objdetect.cli.train_cone_yolo --epochs 5 --device cpu   # quick smoke
+    uv run python -m objdetect.cli.training.train_cone_yolo --epochs 100 --device mps
+    uv run python -m objdetect.cli.training.train_cone_yolo --epochs 5 --device cpu   # quick smoke
 
 Writes reports/figures/cone_yolo_training_<epochs>ep.png +
 reports/cone_yolo_results_<epochs>ep.json (suffixed by epoch budget, so runs at
