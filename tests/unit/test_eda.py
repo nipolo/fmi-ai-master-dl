@@ -94,6 +94,42 @@ class TestClassDistribution(unittest.TestCase):
         self.assertEqual(actual_person_instances, expected_person_instances)
 
 
+class TestBoxesPerImage(unittest.TestCase):
+    def test_when_counted_then_each_image_reports_its_box_count(self):
+        # Arrange
+        coco = _FakeCoco()
+        frame = eda.annotations_frame(coco)
+        expected_boxes_image_10 = 2
+        expected_boxes_image_11 = 1
+
+        # Act
+        boxes = eda.boxes_per_image(frame)
+        actual_boxes_image_10 = int(boxes.loc[10])
+        actual_boxes_image_11 = int(boxes.loc[11])
+
+        # Assert
+        self.assertEqual(actual_boxes_image_10, expected_boxes_image_10)
+        self.assertEqual(actual_boxes_image_11, expected_boxes_image_11)
+
+
+class TestClassCooccurrence(unittest.TestCase):
+    def test_when_computed_then_shared_image_pairs_are_counted(self):
+        # Arrange
+        coco = _FakeCoco()
+        frame = eda.annotations_frame(coco)
+        expected_person_dog = 1
+        expected_person_diagonal = 2
+
+        # Act
+        cooc = eda.class_cooccurrence(frame)
+        actual_person_dog = int(cooc.loc["person", "dog"])
+        actual_person_diagonal = int(cooc.loc["person", "person"])
+
+        # Assert
+        self.assertEqual(actual_person_dog, expected_person_dog)
+        self.assertEqual(actual_person_diagonal, expected_person_diagonal)
+
+
 class TestFindAnomalies(unittest.TestCase):
     def test_when_scanned_then_flags_tiny_crowd_and_extreme_boxes(self):
         # Arrange

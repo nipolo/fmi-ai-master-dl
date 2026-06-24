@@ -60,6 +60,8 @@ objdetect/            # the importable package (lives at repo root, not under sr
                       #   figures/    — plot_lr_schedules, compare_models_visual
 research/             # Req. 1-2: LITERATURE_REVIEW.md, EDA_REPORT.md, 01_eda.ipynb, figures/
 tests/
+  conftest.py         # shared test doubles/fixtures (used by unit + BDD)
+  unit/               # unittest.TestCase suites (course-exercise style)
   features/           # Gherkin .feature files (BDD)
   steps/              # step definitions
 reports/              # MODEL_REPORT.md, presentation, experiment results & training curves

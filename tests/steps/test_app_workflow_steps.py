@@ -3,6 +3,7 @@
 import pytest
 from pytest_bdd import given, parsers, scenarios, then, when
 
+from objdetect.app import inference
 from objdetect.app.inference import (
     detections_to_frame,
     load_model,
@@ -19,15 +20,24 @@ def context() -> dict:
     return {}
 
 
+@given(parsers.parse('a model "{display_name}" whose weights file is missing'))
+def _register_missing_model(context, display_name, monkeypatch, tmp_path):
+    missing = str(tmp_path / "not_installed.pt")
+    models = dict(inference.AVAILABLE_MODELS)
+    models[display_name] = ("yolo", {"weights": missing})
+    monkeypatch.setattr(inference, "AVAILABLE_MODELS", models)
+
+
 @when(parsers.parse('I load a model called "{display_name}"'))
 def _load_model(context, display_name):
     try:
         context["model"] = load_model(display_name)
-    except ValueError as exc:
+    except (ValueError, FileNotFoundError) as exc:
         context["error"] = exc
 
 
 @then(parsers.parse('loading fails with an "{message}" error'))
+@then(parsers.parse('loading fails with a "{message}" error'))
 def _assert_load_error(context, message):
     assert "error" in context, "expected loading to raise, but it succeeded"
     assert message in str(context["error"])

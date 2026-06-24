@@ -7,6 +7,11 @@ Feature: Driving the detection app
     When I load a model called "totally-not-a-model"
     Then loading fails with an "unknown model" error
 
+  Scenario: Choosing a model whose weights are not installed is rejected
+    Given a model "Cones (weights not installed)" whose weights file is missing
+    When I load a model called "Cones (weights not installed)"
+    Then loading fails with a "Model weights not found" error
+
   Scenario: Detections are tabulated for display
     Given detections of a dog and a cat
     When I tabulate the detections
