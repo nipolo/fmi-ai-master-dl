@@ -10,7 +10,7 @@ from objdetect.training.schedulers import sample_lr_curve
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--epochs", type=int, default=12)
+    parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--base-lr", type=float, default=0.005)
     args = parser.parse_args()
 
