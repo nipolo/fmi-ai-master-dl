@@ -36,28 +36,42 @@ def _download_file(url: str, destination: pl.Path, chunk_size: int = 1 << 20) ->
     print()
 
 
+def _fetch_and_unpack(url: str, target: pl.Path, force: bool = False) -> None:
+    """Download a COCO zip and extract it into ``COCO_DIR`` unless ``target`` exists."""
+    if target.exists() and not force:
+        print(f"{target} already present, skipping")
+        return
+    config.COCO_DIR.mkdir(parents=True, exist_ok=True)
+    archive = config.COCO_DIR / url.rsplit("/", 1)[-1]
+    if not archive.exists() or force:
+        print(f"Downloading {url}")
+        _download_file(url, archive)
+    print(f"Unpacking {archive.name}")
+    with zipfile.ZipFile(archive) as zf:
+        zf.extractall(config.COCO_DIR)
+    archive.unlink()
+
+
+def download_coco_annotations(force: bool = False) -> None:
+    """Download just the COCO val2017 instance annotations (no images).
+
+    The EDA reads only box/image metadata, so this skips the ~780 MB image
+    download. Safe to call repeatedly.
+    """
+    _fetch_and_unpack(
+        config.COCO_ANNOTATIONS_URL, config.COCO_ANNOTATIONS_FILE.parent, force=force
+    )
+
+
 def download_coco_val(force: bool = False) -> None:
     """Download and unpack COCO val2017 images and instance annotations.
 
     Skips work that is already done, so it is safe to call repeatedly.
     """
-    config.COCO_DIR.mkdir(parents=True, exist_ok=True)
-    jobs = [
-        (config.COCO_VAL_IMAGES_URL, config.COCO_IMAGES_DIR),
-        (config.COCO_ANNOTATIONS_URL, config.COCO_ANNOTATIONS_FILE.parent),
-    ]
-    for url, target in jobs:
-        if target.exists() and not force:
-            print(f"{target} already present, skipping")
-            continue
-        archive = config.COCO_DIR / url.rsplit("/", 1)[-1]
-        if not archive.exists() or force:
-            print(f"Downloading {url}")
-            _download_file(url, archive)
-        print(f"Unpacking {archive.name}")
-        with zipfile.ZipFile(archive) as zf:
-            zf.extractall(config.COCO_DIR)
-        archive.unlink()
+    _fetch_and_unpack(config.COCO_VAL_IMAGES_URL, config.COCO_IMAGES_DIR, force=force)
+    _fetch_and_unpack(
+        config.COCO_ANNOTATIONS_URL, config.COCO_ANNOTATIONS_FILE.parent, force=force
+    )
 
 
 def load_coco_api(
